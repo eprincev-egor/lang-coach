@@ -411,10 +411,11 @@ describe("Coach tests", () => {
         );
     });
 
-    it("coach.parseComma('SyntaxName')", () => {
+    it("coach.parseComma('SyntaxName', options)", () => {
         class AnyWord extends Syntax {
             static structure() {
                 return {
+                    options: "string",
                     word: "string"
                 };
             }
@@ -423,8 +424,9 @@ describe("Coach tests", () => {
                 return coach.isWord();
             }
 
-            static parse(coach) {
+            static parse(coach, options) {
                 return {
+                    options: JSON.stringify(options),
                     word: coach.expectWord()
                 };
             }
@@ -446,14 +448,29 @@ describe("Coach tests", () => {
         assert.ok( coach.is("some") );
 
         assert.equal( result[0].get("word"), "one" );
+        assert.equal( result[0].get("options"), null );
+
         assert.equal( result[1].get("word"), "two" );
+        assert.equal( result[1].get("options"), null );
+
         assert.equal( result[2].get("word"), "three" );
+        assert.equal( result[2].get("options"), null );
+
+        // run with options
+        coach = new SomeLang("one,\r two\n,\tthree  some");
+        result = coach.parseComma("AnyWord", {x: 1});
+
+
+        assert.equal( result[0].get("options"), "{\"x\":1}" );
+        assert.equal( result[1].get("options"), "{\"x\":1}" );
+        assert.equal( result[2].get("options"), "{\"x\":1}" );
     });
 
     it("coach.parseChain('SyntaxName')", () => {
         class AnyWord extends Syntax {
             static structure() {
                 return {
+                    options: "string",
                     word: "string"
                 };
             }
@@ -462,8 +479,9 @@ describe("Coach tests", () => {
                 return coach.isWord();
             }
 
-            static parse(coach) {
+            static parse(coach, options) {
                 return {
+                    options: JSON.stringify(options),
                     word: coach.expectWord()
                 };
             }
@@ -485,8 +503,21 @@ describe("Coach tests", () => {
         assert.ok( coach.is("!!!") );
 
         assert.equal( result[0].get("word"), "one" );
+        assert.equal( result[0].get("options"), null );
+
         assert.equal( result[1].get("word"), "two" );
+        assert.equal( result[1].get("options"), null );
+
         assert.equal( result[2].get("word"), "three" );
+        assert.equal( result[2].get("options"), null );
+
+        // run with options
+        coach = new SomeLang("one\r two\n \tthree  !!!");
+        result = coach.parseChain("AnyWord", {x: 1});
+
+        assert.equal( result[0].get("options"), "{\"x\":1}" );
+        assert.equal( result[1].get("options"), "{\"x\":1}" );
+        assert.equal( result[2].get("options"), "{\"x\":1}" );
     });
 
 });
