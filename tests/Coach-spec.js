@@ -379,10 +379,8 @@ describe("Coach tests", () => {
                 return coach.isWord();
             }
 
-            static parse(coach) {
-                return {
-                    word: coach.expectWord()
-                };
+            static parse(coach, data) {
+                data.word = coach.expectWord();
             }
         }
 
@@ -424,11 +422,9 @@ describe("Coach tests", () => {
                 return coach.isWord();
             }
 
-            static parse(coach, options) {
-                return {
-                    options: JSON.stringify(options),
-                    word: coach.expectWord()
-                };
+            static parse(coach, data, options) {
+                data.options = JSON.stringify(options);
+                data.word = coach.expectWord();
             }
         }
 
@@ -479,11 +475,9 @@ describe("Coach tests", () => {
                 return coach.isWord();
             }
 
-            static parse(coach, options) {
-                return {
-                    options: JSON.stringify(options),
-                    word: coach.expectWord()
-                };
+            static parse(coach, data, options) {
+                data.options = JSON.stringify(options);
+                data.word = coach.expectWord();
             }
         }
 
