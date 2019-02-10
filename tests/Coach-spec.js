@@ -551,6 +551,49 @@ describe("Coach tests", () => {
         );
     });
 
+    it("coach.parseComma('SyntaxName', options), check options in call: coach.is()", () => {
+        class AnyWord extends Syntax {
+            static structure() {
+                return {
+                    word: "string"
+                };
+            }
+
+            static is(coach, str, options) {
+                options = options || {numbers: false};
+                return (
+                    coach.is(/[a-z]/) ||
+
+                    options.numbers &&
+                    coach.is(/\d/)
+                );
+            }
+
+            static parse(coach, data, options) {
+                options = options || {numbers: false};
+
+                if ( options.numbers ) {
+                    data.word = coach.expect(/[\w\d]+/);
+                } else {
+                    data.word = coach.expect(/[a-z]/);
+                }
+            }
+        }
+
+        class SomeLang extends Coach {}
+        SomeLang.syntax( AnyWord );
+
+        let coach = new SomeLang("1, 2, 3");
+
+        let result = coach.parseComma("AnyWord", {
+            numbers: true
+        });
+
+        assert.equal( result[0].get("word"), "1" );
+        assert.equal( result[1].get("word"), "2" );
+        assert.equal( result[2].get("word"), "3" );
+    });
+
     it("coach.parseChain('SyntaxName')", () => {
         class AnyWord extends Syntax {
             static structure() {
@@ -601,6 +644,49 @@ describe("Coach tests", () => {
         assert.equal( result[0].get("options"), "{\"x\":1}" );
         assert.equal( result[1].get("options"), "{\"x\":1}" );
         assert.equal( result[2].get("options"), "{\"x\":1}" );
+    });
+
+    it("coach.parseChain('SyntaxName', options), check options in call: coach.is()", () => {
+        class AnyWord extends Syntax {
+            static structure() {
+                return {
+                    word: "string"
+                };
+            }
+
+            static is(coach, str, options) {
+                options = options || {numbers: false};
+                return (
+                    coach.is(/[a-z]/) ||
+
+                    options.numbers &&
+                    coach.is(/\d/)
+                );
+            }
+
+            static parse(coach, data, options) {
+                options = options || {numbers: false};
+
+                if ( options.numbers ) {
+                    data.word = coach.expect(/[\w\d]+/);
+                } else {
+                    data.word = coach.expect(/[a-z]/);
+                }
+            }
+        }
+
+        class SomeLang extends Coach {}
+        SomeLang.syntax( AnyWord );
+
+        let coach = new SomeLang("1 2 3");
+
+        let result = coach.parseChain("AnyWord", {
+            numbers: true
+        });
+
+        assert.equal( result[0].get("word"), "1" );
+        assert.equal( result[1].get("word"), "2" );
+        assert.equal( result[2].get("word"), "3" );
     });
 
 });
