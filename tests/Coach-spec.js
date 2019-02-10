@@ -38,6 +38,32 @@ describe("Coach tests", () => {
         assert.ok( !coach.is(ChildSyntax) );
     });
 
+    it("coach.is(Syntax, options)", () => {
+        class ChildSyntax extends Syntax {
+            static is(coach, str, options) {
+                options = options || {alphabet: false};
+
+                return (
+                    coach.is(/\d/) ||
+
+                    options.alphabet &&
+                    coach.is(/\w/)
+                );
+            }
+        }
+
+        let coach;
+        
+        coach = new Coach("1");
+        assert.ok( coach.is(ChildSyntax) );
+
+        coach = new Coach("a");
+        assert.ok( !coach.is(ChildSyntax) );
+
+        coach = new Coach("a");
+        assert.ok( coach.is(ChildSyntax, {alphabet: true}) );
+    });
+
     it("coach.is(undefined)", () => {
         let coach = new Coach("1");
         
@@ -407,6 +433,35 @@ describe("Coach tests", () => {
             err =>
                 err.message == "Syntax must be class"
         );
+    });
+
+    it("coach.isSyntax(options)", () => {
+        class Some extends Syntax {
+            static is(coach, str, options) {
+                options = options || {alphabet: false};
+
+                return (
+                    coach.is(/\d/) ||
+
+                    options.alphabet &&
+                    coach.is(/\w/)
+                );
+            }
+        }
+
+        class SomeLang extends Coach {}
+        SomeLang.syntax( Some );
+
+        let coach;
+        
+        coach = new SomeLang("1");
+        assert.ok( coach.isSome() );
+
+        coach = new SomeLang("a");
+        assert.ok( !coach.isSome() );
+
+        coach = new SomeLang("a");
+        assert.ok( coach.isSome({ alphabet: true }) );
     });
 
     it("coach.parseComma('SyntaxName', options)", () => {
