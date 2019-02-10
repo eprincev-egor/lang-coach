@@ -575,7 +575,7 @@ describe("Coach tests", () => {
                 if ( options.numbers ) {
                     data.word = coach.expect(/[\w\d]+/);
                 } else {
-                    data.word = coach.expect(/[a-z]/);
+                    data.word = coach.expect(/[a-z]+/);
                 }
             }
         }
@@ -589,9 +589,19 @@ describe("Coach tests", () => {
             numbers: true
         });
 
+        assert.equal( result.length, 3 );
         assert.equal( result[0].get("word"), "1" );
         assert.equal( result[1].get("word"), "2" );
         assert.equal( result[2].get("word"), "3" );
+
+
+        // without options
+        coach = new SomeLang("some, word");
+
+        result = coach.parseComma("AnyWord");
+        assert.equal( result.length, 2 );
+        assert.equal( result[0].get("word"), "some" );
+        assert.equal( result[1].get("word"), "word" );
     });
 
     it("coach.parseChain('SyntaxName')", () => {
@@ -670,7 +680,7 @@ describe("Coach tests", () => {
                 if ( options.numbers ) {
                     data.word = coach.expect(/[\w\d]+/);
                 } else {
-                    data.word = coach.expect(/[a-z]/);
+                    data.word = coach.expect(/[a-z]+/);
                 }
             }
         }
@@ -684,9 +694,19 @@ describe("Coach tests", () => {
             numbers: true
         });
 
+        assert.equal( result.length, 3 );
         assert.equal( result[0].get("word"), "1" );
         assert.equal( result[1].get("word"), "2" );
         assert.equal( result[2].get("word"), "3" );
+
+
+        // without options
+        coach = new SomeLang("some 1");
+
+        result = coach.parseChain("AnyWord");
+
+        assert.equal( result.length, 1 );
+        assert.equal( result[0].get("word"), "some" );
     });
 
 });
