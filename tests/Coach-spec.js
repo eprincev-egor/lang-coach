@@ -276,6 +276,18 @@ describe("Coach tests", () => {
                     "\n Message: expected: text"
         );
         assert.ok( coach.is("some") );
+
+
+        assert.throws(
+            () => {
+                coach.expect("text", "custom error message");
+            }, 
+            err =>
+                err.message == "SyntaxError at line 1" +
+                    ", column 0" +
+                    ", at near `some text`" +
+                    "\n Message: custom error message"
+        );
     });
 
     it("coach.expect(regExp)", () => {
@@ -303,6 +315,18 @@ describe("Coach tests", () => {
                     "\n Message: expected: /text/"
         );
         assert.ok( coach.is("some") );
+
+
+        assert.throws(
+            () => {
+                coach.expect(/text/, "custom error text");
+            }, 
+            err =>
+                err.message == "SyntaxError at line 1" +
+                    ", column 0" +
+                    ", at near `some text`" +
+                    "\n Message: custom error text"
+        );
     });
 
     it("coach.expectWord(str)", () => {
@@ -508,13 +532,23 @@ describe("Coach tests", () => {
         assert.equal( result[2].get("options"), null );
 
         // run with options
-        coach = new SomeLang("one,\r two\n,\tthree  some");
+        coach = new SomeLang("one,\r two\n,\tthree  !!!");
         result = coach.parseComma("AnyWord", {x: 1});
 
 
         assert.equal( result[0].get("options"), "{\"x\":1}" );
         assert.equal( result[1].get("options"), "{\"x\":1}" );
         assert.equal( result[2].get("options"), "{\"x\":1}" );
+
+
+        assert.throws(
+            () => {
+                coach = new SomeLang("!!");
+                result = coach.parseComma("AnyWord");
+            },
+            err =>
+                /expected: AnyWord/.test( err.message )
+        );
     });
 
     it("coach.parseChain('SyntaxName')", () => {
