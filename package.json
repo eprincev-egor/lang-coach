@@ -1,6 +1,6 @@
 {
   "name": "lang-coach",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "libary for parsing languages",
   "main": "lib/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "author": "Eprincev Egor",
   "license": "ISC",
   "dependencies": {
-    "model-layer": "^1.1.6"
+    "model-layer": "^1.1.7"
   },
   "devDependencies": {
     "eslint": "^5.13.0",
