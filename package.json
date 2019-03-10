@@ -16,7 +16,7 @@
   "author": "Eprincev Egor",
   "license": "ISC",
   "dependencies": {
-    "model-layer": "^1.1.7"
+    "model-layer": "^1.3.5"
   },
   "devDependencies": {
     "eslint": "^5.13.0",
