@@ -1,17 +1,12 @@
-"use strict";
-
-const index = require("../lib/index");
-
-"use strict";
-
-const assert = require("assert");
+import {Syntax, Coach} from "../lib/index";
+import assert from "assert";
 
 describe("index tests", () => {
     
     it("index has Syntax and Coach", () => {
 
-        assert.ok( index.Syntax );
-        assert.ok( index.Coach );
+        assert.ok( Syntax );
+        assert.ok( Coach );
 
     });
 

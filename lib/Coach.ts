@@ -1,11 +1,10 @@
-"use strict";
+import {Syntax} from "./Syntax";
 
-const Syntax = require("./Syntax");
-
-class Coach {
+export class Coach {
+    
     static syntax(SyntaxClass) {
-        let isSyntaxClass = (
-            typeof SyntaxClass == "function" &&
+        const isSyntaxClass = (
+            typeof SyntaxClass === "function" &&
             SyntaxClass.prototype instanceof Syntax
         );
 
@@ -13,8 +12,8 @@ class Coach {
             throw new Error("Syntax must be class");
         }
 
-        let ChildCoach = this;
-        let syntaxName = SyntaxClass.name;
+        const ChildCoach = this;
+        const syntaxName = SyntaxClass.name;
 
         ChildCoach[ syntaxName ] = SyntaxClass;
         SyntaxClass.prototype.Coach = ChildCoach;
@@ -28,17 +27,20 @@ class Coach {
 
         funcName = "parse" + syntaxName;
         ChildCoach.prototype[funcName] = function parseSyntax(options) {
-            let coach = this;
+            const coach = this;
             
             // modify by reference
-            let data = {};
+            const data = {};
             SyntaxClass.parse(coach, data, options);
             
-            let syntax = new SyntaxClass( data );
+            const syntax = new SyntaxClass( data );
 
             return syntax;
         };
     }
+    public str: string;
+    public n: number;
+    public i: number;
 
     constructor(str) {
         this.str = str;
@@ -48,7 +50,7 @@ class Coach {
     
     skipSpace() {
         for (; this.i < this.n; this.i++) {
-            let symbol = this.str[ this.i ];
+            const symbol = this.str[ this.i ];
 
             if ( !/\s/.test(symbol) ) {
                 break;
@@ -62,7 +64,7 @@ class Coach {
         this.skipSpace();
 
         for (; this.i < this.n; this.i++) {
-            let symbol = this.str[ this.i ];
+            const symbol = this.str[ this.i ];
 
             if ( /[^\w]/.test(symbol) ) {
                 break;
@@ -77,34 +79,34 @@ class Coach {
     }
 
     // test string (from current place) on regExp
-    is(regExpOrStringOrSyntax, options) {
-        let str = this.str.slice(this.i);
+    is(regExpOrStringOrSyntax, options?) {
+        const str = this.str.slice(this.i);
 
-        let isString = (
-            typeof regExpOrStringOrSyntax == "string"
+        const isString = (
+            typeof regExpOrStringOrSyntax === "string"
         );
-        let isSyntax = (
-            typeof regExpOrStringOrSyntax    == "function" &&
-            typeof regExpOrStringOrSyntax.is == "function"
+        const isSyntax = (
+            typeof regExpOrStringOrSyntax    === "function" &&
+            typeof regExpOrStringOrSyntax.is === "function"
         );
-        let isRegExp = (
+        const isRegExp = (
             regExpOrStringOrSyntax instanceof RegExp
         );
 
         if ( isSyntax ) {
-            let Syntax = regExpOrStringOrSyntax;
+            const ChildSyntax = regExpOrStringOrSyntax;
 
-            return Syntax.is(this, str, options);
+            return ChildSyntax.is(this, str, options);
         }
 
         else if ( isString ) {
-            let testString = regExpOrStringOrSyntax;
+            const testString = regExpOrStringOrSyntax;
 
             return str.indexOf(testString) === 0;
         }
 
         else if ( isRegExp ) {
-            let regExp = regExpOrStringOrSyntax;
+            const regExp = regExpOrStringOrSyntax;
 
             return str.search(regExp) === 0;
         }
@@ -119,16 +121,16 @@ class Coach {
             return this.is(/\w/i);
         }
 
-        let i = this.i;
-        let currentWord = this.readWord();
+        const i = this.i;
+        const currentWord = this.readWord();
         this.i = i;
 
-        return currentWord.toLowerCase() == word;
+        return currentWord.toLowerCase() === word;
     }
 
     read(regExp) {
-        let str = this.str.slice(this.i);
-        let execResult = regExp.exec(str);
+        const str = this.str.slice(this.i);
+        const execResult = regExp.exec(str);
 
         if ( !execResult || execResult.index !== 0 ) {
             return null;
@@ -138,33 +140,20 @@ class Coach {
         return execResult[0];
     }
 
-    checkpoint() {
-        this._checkpoint = this.i;
-    }
-
-    rollback() {
-        if ( this._checkpoint == null ) {
-            throw new Error("checkpoint does not exists");
-        }
-
-        this.i = this._checkpoint;
-    }
-
-    
     getPosition() {
-        let index = this.i;
+        const index = this.i;
         
-        let lines = this.str.slice(0, index)
+        const lines = this.str.slice(0, index)
             // mac, windows, linux
             .split(/\r\n?|\n/);
         
-        let line = lines.length;
+        const line = lines.length;
 
         let column = 0;
 
         // find first break char
         for (let i = index; i > 0; i--) {
-            let symbol = this.str[ i ];
+            const symbol = this.str[ i ];
 
             if ( /[\n\r]/.test(symbol) ) {
                 break;
@@ -182,9 +171,9 @@ class Coach {
 
     
     throwError(message) {
-        let position = this.getPosition();
+        const position = this.getPosition();
 
-        let nearString = this.str.slice(Math.max(position.index, 0), position.index + 30);
+        const nearString = this.str.slice(Math.max(position.index, 0), position.index + 30);
         throw new Error(
             "SyntaxError at line " + position.line +
                 ", column " + position.column +
@@ -194,8 +183,8 @@ class Coach {
     }
 
     expect(strOrRegExp, message) {
-        if ( typeof strOrRegExp == "string" ) {
-            let str = strOrRegExp;
+        if ( typeof strOrRegExp === "string" ) {
+            const str = strOrRegExp;
 
             if ( this.str.slice(this.i).indexOf(str) === 0 ) {
                 this.i += str.length;
@@ -208,9 +197,9 @@ class Coach {
 
             return str;
         } else {
-            let regExp = strOrRegExp;
-            let str = this.str.slice(this.i);
-            let execResult = regExp.exec(str);
+            const regExp = strOrRegExp;
+            const str = this.str.slice(this.i);
+            const execResult = regExp.exec(str);
 
             if ( !execResult || execResult.index !== 0 ) {
                 if ( message == null ) {
@@ -225,10 +214,10 @@ class Coach {
     }
 
     
-    expectWord(word) {
-        let i = this.i;
+    expectWord(word?) {
+        const i = this.i;
 
-        let currentWord = this.readWord();
+        const currentWord = this.readWord();
 
         if ( word == null ) {
             if ( !currentWord ) {
@@ -239,7 +228,7 @@ class Coach {
             return currentWord;
         }
 
-        if ( currentWord == word ) {
+        if ( currentWord === word ) {
             return currentWord;
         }
 
@@ -254,8 +243,9 @@ class Coach {
                 throw new Error();
             }
 
+            // tslint:disable-next-line: no-eval
             unicode = eval("'\\u{" + unicode + "}'");
-        } catch(err) {
+        } catch (err) {
             this.throwError("invalid unicode sequence: " + unicode);
         }
 
@@ -274,11 +264,11 @@ class Coach {
     //    is: function,
     //    parse: function
     // }
-    parseComma(SyntaxName, options) {
-        let elements = [];
+    parseComma(SyntaxName, options?) {
+        const elements = [];
 
-        let parseSyntax = this[ "parse" + SyntaxName ].bind(this, options);
-        let isSyntax = this[ "is" + SyntaxName ].bind(this, options);
+        const parseSyntax = this[ "parse" + SyntaxName ].bind(this, options);
+        const isSyntax = this[ "is" + SyntaxName ].bind(this, options);
 
         this._parseComma(SyntaxName, isSyntax, parseSyntax, elements);
 
@@ -290,7 +280,7 @@ class Coach {
             this.throwError("expected: " + SyntaxName);
         }
 
-        let elem = parseSyntax();
+        const elem = parseSyntax();
         elements.push( elem );
 
         if ( this.is(/\s*,/) ) {
@@ -313,11 +303,11 @@ class Coach {
     //    is: function,
     //    parse: function
     // }
-    parseChain(SyntaxName, options) {
-        let elements = [];
+    parseChain(SyntaxName, options?) {
+        const elements = [];
 
-        let parseSyntax = this[ "parse" + SyntaxName ].bind(this, options);
-        let isSyntax = this[ "is" + SyntaxName ].bind(this, options);
+        const parseSyntax = this[ "parse" + SyntaxName ].bind(this, options);
+        const isSyntax = this[ "is" + SyntaxName ].bind(this, options);
 
         this._parseChain(isSyntax, parseSyntax, elements);
 
@@ -325,11 +315,11 @@ class Coach {
     }
 
     _parseChain(isSyntax, parseSyntax, elements) {
-        let i = this.i;
+        const i = this.i;
         this.skipSpace();
 
         if ( isSyntax() ) {
-            let elem = parseSyntax();
+            const elem = parseSyntax();
             elements.push( elem );
 
             this._parseChain(isSyntax, parseSyntax, elements);
@@ -341,6 +331,3 @@ class Coach {
     }
 
 }
-
-
-module.exports = Coach;

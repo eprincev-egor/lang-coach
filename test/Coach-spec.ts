@@ -1,14 +1,13 @@
-"use strict";
 
-const assert = require("assert");
-const {Model} = require("model-layer");
-const Coach = require("../lib/Coach");
-const Syntax = require("../lib/Syntax");
+import assert from "assert";
+import {Model, Types} from "model-layer";
+import {Coach} from "../lib/Coach";
+import {Syntax} from "../lib/Syntax";
 
 describe("Coach tests", () => {
     
     it("coach.is(str)", () => {
-        let coach = new Coach("some");
+        const coach = new Coach("some");
 
         assert.ok( coach.is("some") );
         assert.ok( coach.is("so") );
@@ -16,16 +15,16 @@ describe("Coach tests", () => {
     });
     
     it("coach.is(regExp)", () => {
-        let coach = new Coach("123");
+        const coach = new Coach("123");
 
         assert.ok( coach.is(/\d\d/) );
         assert.ok( !coach.is(/8/) );
     });
 
     it("coach.is(Syntax)", () => {
-        class ChildSyntax extends Syntax {
-            static is(coach) {
-                return coach.is("1");
+        class ChildSyntax extends Syntax<any> {
+            static is(coach2) {
+                return coach2.is("1");
             }
         }
 
@@ -39,15 +38,15 @@ describe("Coach tests", () => {
     });
 
     it("coach.is(Syntax, options)", () => {
-        class ChildSyntax extends Syntax {
-            static is(coach, str, options) {
+        class ChildSyntax extends Syntax<any> {
+            static is(coach2, str, options) {
                 options = options || {alphabet: false};
 
                 return (
-                    coach.is(/\d/) ||
+                    coach2.is(/\d/) ||
 
                     options.alphabet &&
-                    coach.is(/\w/)
+                    coach2.is(/\w/)
                 );
             }
         }
@@ -65,19 +64,19 @@ describe("Coach tests", () => {
     });
 
     it("coach.is(undefined)", () => {
-        let coach = new Coach("1");
+        const coach = new Coach("1");
         
         assert.throws(
             () => {
-                coach.is();
+                (coach as any).is();
             }, 
-            err =>
-                err.message == "invalid call, use is(arg) with regExp or string or Syntax"
+            (err) =>
+                err.message === "invalid call, use is(arg) with regExp or string or Syntax"
         );
     });
 
     it("coach.skipSpace()", () => {
-        let coach = new Coach(" \n\r\t 1 \t 2  \r 3");
+        const coach = new Coach(" \n\r\t 1 \t 2  \r 3");
 
         assert.ok( coach.is(" ") );
         assert.ok( coach.is(/\s/) );
@@ -96,10 +95,10 @@ describe("Coach tests", () => {
     });
 
     it("coach.readWord()", () => {
-        let coach = new Coach(" Hello World 1");
+        const coach = new Coach(" Hello World 1");
 
-        let firstWord = coach.readWord();
-        let secondWord = coach.readWord();
+        const firstWord = coach.readWord();
+        const secondWord = coach.readWord();
 
         assert.equal(firstWord, "hello");
         assert.equal(secondWord, "world");
@@ -122,7 +121,7 @@ describe("Coach tests", () => {
 
     it("coach.read(regExp)", () => {
         let result;
-        let coach = new Coach("hello!  world");
+        const coach = new Coach("hello!  world");
 
         result = coach.read(/\w+/);
 
@@ -145,30 +144,8 @@ describe("Coach tests", () => {
         assert.strictEqual( result, "world" );
     });
 
-    it("coach.checkpoint()", () => {
-        let coach = new Coach("some text here");
-
-        assert.ok( coach.isWord("some") );
-
-        assert.throws(
-            () => {
-                coach.rollback();
-            }, 
-            err =>
-                err.message == "checkpoint does not exists"
-        );
-        
-        coach.checkpoint();
-        coach.readWord();
-
-        assert.ok( coach.isWord("text") );
-
-        coach.rollback();
-        assert.ok( coach.isWord("some") );
-    });
-
     it("coach.getPosition()", () => {
-        let coach = new Coach("line 1\nline 2\rline 3\r\nline 4");
+        const coach = new Coach("line 1\nline 2\rline 3\r\nline 4");
 
         assert.ok( coach.is(/line 1/) );
         assert.deepEqual(
@@ -234,7 +211,7 @@ describe("Coach tests", () => {
     });
 
     it("coach.throwError(message)", () => {
-        let coach = new Coach("some\nstring");
+        const coach = new Coach("some\nstring");
 
         coach.readWord();
 
@@ -242,8 +219,8 @@ describe("Coach tests", () => {
             () => {
                 coach.throwError("test");
             }, 
-            err =>
-                err.message == "SyntaxError at line 2" +
+            (err) =>
+                err.message === "SyntaxError at line 2" +
                     ", column 1" +
                     ", at near `string`" +
                     "\n Message: test"
@@ -269,8 +246,8 @@ describe("Coach tests", () => {
             () => {
                 coach.expect("text");
             }, 
-            err =>
-                err.message == "SyntaxError at line 1" +
+            (err) =>
+                err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     ", at near `some text`" +
                     "\n Message: expected: text"
@@ -282,8 +259,8 @@ describe("Coach tests", () => {
             () => {
                 coach.expect("text", "custom error message");
             }, 
-            err =>
-                err.message == "SyntaxError at line 1" +
+            (err) =>
+                err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     ", at near `some text`" +
                     "\n Message: custom error message"
@@ -308,8 +285,8 @@ describe("Coach tests", () => {
             () => {
                 coach.expect(/text/);
             }, 
-            err =>
-                err.message == "SyntaxError at line 1" +
+            (err) =>
+                err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     ", at near `some text`" +
                     "\n Message: expected: /text/"
@@ -321,8 +298,8 @@ describe("Coach tests", () => {
             () => {
                 coach.expect(/text/, "custom error text");
             }, 
-            err =>
-                err.message == "SyntaxError at line 1" +
+            (err) =>
+                err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     ", at near `some text`" +
                     "\n Message: custom error text"
@@ -348,8 +325,8 @@ describe("Coach tests", () => {
             () => {
                 coach.expectWord("some");
             }, 
-            err =>
-                err.message == "SyntaxError at line 1" +
+            (err) =>
+                err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     ", at near `wrong`" +
                     "\n Message: expected word: some"
@@ -376,8 +353,8 @@ describe("Coach tests", () => {
             () => {
                 coach.expectWord();
             }, 
-            err =>
-                err.message == "SyntaxError at line 1" +
+            (err) =>
+                err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     ", at near `***`" +
                     "\n Message: expected any word"
@@ -386,9 +363,9 @@ describe("Coach tests", () => {
     });
     
     it("coach.parseUnicode(unicode)", () => {
-        let coach = new Coach("");
+        const coach = new Coach("");
 
-        let result = coach.parseUnicode("67");
+        const result = coach.parseUnicode("67");
 
         assert.equal( result, "g" );
 
@@ -396,8 +373,8 @@ describe("Coach tests", () => {
             () => {
                 coach.parseUnicode("***");
             }, 
-            err =>
-                err.message == "SyntaxError at line 1" +
+            (err) =>
+                err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     ", at near ``" +
                     "\n Message: invalid unicode sequence: ***"
@@ -418,57 +395,58 @@ describe("Coach tests", () => {
     });
 
     it("Coach.syntax", () => {
-        class AnyWord extends Syntax {
-            static structure() {
+        class AnyWord extends Syntax<AnyWord> {
+            static is(coach2) {
+                return coach2.isWord();
+            }
+
+            static parse(coach2, data) {
+                data.word = coach2.expectWord();
+            }
+
+            structure() {
                 return {
-                    word: "string"
+                    word: Types.String
                 };
             }
-
-            static is(coach) {
-                return coach.isWord();
-            }
-
-            static parse(coach, data) {
-                data.word = coach.expectWord();
-            }
         }
+        
 
         class SomeLang extends Coach {}
         SomeLang.syntax( AnyWord );
 
 
-        let coach = new SomeLang("any");
+        const coach = new SomeLang("any");
 
-        assert.ok( coach.isAnyWord() );
+        assert.ok( (coach as any).isAnyWord() );
 
-        let syntax = coach.parseAnyWord();
+        const syntax = (coach as any).parseAnyWord();
 
         assert.ok( syntax instanceof AnyWord );
         assert.ok( syntax instanceof Model );
 
-        assert.ok( syntax.get("word") == "any" );
+        assert.ok( syntax.get("word") === "any" );
 
 
         assert.throws(
             () => {
                 SomeLang.syntax( false );
             }, 
-            err =>
-                err.message == "Syntax must be class"
+            (err) =>
+                err.message === "Syntax must be class"
         );
     });
 
     it("coach.isSyntax(options)", () => {
-        class Some extends Syntax {
-            static is(coach, str, options) {
+        class Some extends Syntax<any> {
+            static is(coach2, str, options) {
                 options = options || {alphabet: false};
 
                 return (
-                    coach.is(/\d/) ||
+                    coach2.is(/\d/) ||
 
                     options.alphabet &&
-                    coach.is(/\w/)
+                    coach2.is(/\w/)
                 );
             }
         }
@@ -489,21 +467,22 @@ describe("Coach tests", () => {
     });
 
     it("coach.parseComma('SyntaxName', options)", () => {
-        class AnyWord extends Syntax {
-            static structure() {
-                return {
-                    options: "string",
-                    word: "string"
-                };
+        class AnyWord extends Syntax<AnyWord> {
+
+            static is(coach2) {
+                return coach2.isWord();
             }
 
-            static is(coach) {
-                return coach.isWord();
-            }
-
-            static parse(coach, data, options) {
+            static parse(coach2, data, options) {
                 data.options = JSON.stringify(options);
-                data.word = coach.expectWord();
+                data.word = coach2.expectWord();
+            }
+
+            structure() {
+                return {
+                    options: Types.String,
+                    word: Types.String
+                };
             }
         }
 
@@ -546,37 +525,37 @@ describe("Coach tests", () => {
                 coach = new SomeLang("!!");
                 result = coach.parseComma("AnyWord");
             },
-            err =>
+            (err) =>
                 /expected: AnyWord/.test( err.message )
         );
     });
 
     it("coach.parseComma('SyntaxName', options), check options in call: coach.is()", () => {
-        class AnyWord extends Syntax {
-            static structure() {
-                return {
-                    word: "string"
-                };
-            }
+        class AnyWord extends Syntax<AnyWord> {
 
-            static is(coach, str, options) {
+            static is(coach2, str, options) {
                 options = options || {numbers: false};
                 return (
-                    coach.is(/[a-z]/) ||
+                    coach2.is(/[a-z]/) ||
 
                     options.numbers &&
-                    coach.is(/\d/)
+                    coach2.is(/\d/)
                 );
             }
 
-            static parse(coach, data, options) {
+            static parse(coach2, data, options) {
                 options = options || {numbers: false};
 
                 if ( options.numbers ) {
-                    data.word = coach.expect(/[\w\d]+/);
+                    data.word = coach2.expect(/[\w\d]+/);
                 } else {
-                    data.word = coach.expect(/[a-z]+/);
+                    data.word = coach2.expect(/[a-z]+/);
                 }
+            }
+            structure() {
+                return {
+                    word: Types.String
+                };
             }
         }
 
@@ -605,21 +584,21 @@ describe("Coach tests", () => {
     });
 
     it("coach.parseChain('SyntaxName')", () => {
-        class AnyWord extends Syntax {
-            static structure() {
-                return {
-                    options: "string",
-                    word: "string"
-                };
+        class AnyWord extends Syntax<AnyWord> {
+
+            static is(coach2) {
+                return coach2.isWord();
             }
 
-            static is(coach) {
-                return coach.isWord();
-            }
-
-            static parse(coach, data, options) {
+            static parse(coach2, data, options) {
                 data.options = JSON.stringify(options);
                 data.word = coach.expectWord();
+            }
+            structure() {
+                return {
+                    options: Types.String,
+                    word: Types.String
+                };
             }
         }
 
@@ -657,31 +636,31 @@ describe("Coach tests", () => {
     });
 
     it("coach.parseChain('SyntaxName', options), check options in call: coach.is()", () => {
-        class AnyWord extends Syntax {
-            static structure() {
-                return {
-                    word: "string"
-                };
-            }
+        class AnyWord extends Syntax<AnyWord> {
 
-            static is(coach, str, options) {
+            static is(coach2, str, options) {
                 options = options || {numbers: false};
                 return (
-                    coach.is(/[a-z]/) ||
+                    coach2.is(/[a-z]/) ||
 
                     options.numbers &&
-                    coach.is(/\d/)
+                    coach2.is(/\d/)
                 );
             }
 
-            static parse(coach, data, options) {
+            static parse(coach2, data, options) {
                 options = options || {numbers: false};
 
                 if ( options.numbers ) {
-                    data.word = coach.expect(/[\w\d]+/);
+                    data.word = coach2.expect(/[\w\d]+/);
                 } else {
-                    data.word = coach.expect(/[a-z]+/);
+                    data.word = coach2.expect(/[a-z]+/);
                 }
+            }
+            structure() {
+                return {
+                    word: Types.String
+                };
             }
         }
 

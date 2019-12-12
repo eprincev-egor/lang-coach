@@ -1,9 +1,8 @@
-"use strict";
 
-const Syntax = require("./Syntax");
-const Coach = require("./Coach");
+import {Syntax} from "./Syntax";
+import {Coach} from "./Coach";
 
-module.exports = {
+export {
     Syntax,
     Coach
 };

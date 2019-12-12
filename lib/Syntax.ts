@@ -1,31 +1,16 @@
-"use strict";
+import {Model} from "model-layer";
 
-const {Model} = require("model-layer");
-
-class Syntax extends Model {
-
-    static parse(coach, options) {
-        // for eslint
-        coach;
-        options;
-
+export class Syntax<TSyntax extends Syntax<any>> extends Model<TSyntax> {
+    
+    static parse(coach, data, options) {
         throw new Error(`static ${ this.name }.parse(coach, options) is not declared`);
     }
 
-    static is(coach, options) {
-        // for eslint
-        coach;
-        options;
-
+    static is(coach, str, options) {
         throw new Error(`static ${ this.name }.is(coach, options) is not declared`);
     }
 
-    toString(options) {
-        // for eslint
-        options;
-
+    toString(options?) {
         throw new Error(`${ this.constructor.name }.toString(options) is not declared`);
     }
 }
-
-module.exports = Syntax;
