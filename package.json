@@ -1,8 +1,9 @@
 {
   "name": "lang-coach",
-  "version": "1.1.9",
+  "version": "2.0.0",
   "description": "libary for parsing languages",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
+  "types": "lib/index.ts",
   "scripts": {
     "build": "tsc",
     "lint": "tslint -c tslint.json 'lib/**/*.ts' && tslint -c test/tslint.json 'test/**/*.ts'",
@@ -35,7 +36,7 @@
   "author": "Eprincev Egor",
   "license": "ISC",
   "dependencies": {
-    "model-layer": "^2.0.1"
+    "model-layer": "^2.0.2"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",

@@ -1,54 +1,32 @@
 import {Syntax} from "./Syntax";
 
+interface IAnyObject {
+    [key: string]: any;
+}
+
+interface IPosition {
+    index: number;
+    line: number;
+    column: number;
+}
+
 export class Coach {
     
-    static syntax(SyntaxClass) {
-        const isSyntaxClass = (
-            typeof SyntaxClass === "function" &&
-            SyntaxClass.prototype instanceof Syntax
-        );
-
-        if ( !isSyntaxClass ) {
-            throw new Error("Syntax must be class");
-        }
-
-        const ChildCoach = this;
-        const syntaxName = SyntaxClass.name;
-
-        ChildCoach[ syntaxName ] = SyntaxClass;
-        SyntaxClass.prototype.Coach = ChildCoach;
-
-        let funcName;
-
-        funcName = "is" + syntaxName;
-        ChildCoach.prototype[funcName] = function isSyntax(options) {
-            return this.is(SyntaxClass, options);
-        };
-
-        funcName = "parse" + syntaxName;
-        ChildCoach.prototype[funcName] = function parseSyntax(options) {
-            const coach = this;
-            
-            // modify by reference
-            const data = {};
-            SyntaxClass.parse(coach, data, options);
-            
-            const syntax = new SyntaxClass( data );
-
-            return syntax;
-        };
-    }
     public str: string;
     public n: number;
     public i: number;
 
-    constructor(str) {
+    public syntax: {
+        [key: string]: new (...args: any) => Syntax<any>;
+    };
+
+    constructor(str: string) {
         this.str = str;
         this.n = str.length;
         this.i = 0;
     }
     
-    skipSpace() {
+    skipSpace(): void {
         for (; this.i < this.n; this.i++) {
             const symbol = this.str[ this.i ];
 
@@ -58,7 +36,7 @@ export class Coach {
         }
     }
 
-    readWord() {
+    readWord(): string {
         let word = "";
 
         this.skipSpace();
@@ -79,33 +57,29 @@ export class Coach {
     }
 
     // test string (from current place) on regExp
-    is(regExpOrStringOrSyntax, options?) {
+    is(strOrRegExp: string | RegExp, options?: IAnyObject): boolean;
+    is<K extends keyof this["syntax"]>(Syntax: this["syntax"][K], options?: IAnyObject): boolean;
+    is<K extends keyof this["syntax"]>(
+        regExpOrStringOrSyntax: string | 
+        RegExp | 
+        this["syntax"][K], 
+        options?: IAnyObject
+    ): boolean {
         const str = this.str.slice(this.i);
 
-        const isString = (
-            typeof regExpOrStringOrSyntax === "string"
-        );
-        const isSyntax = (
-            typeof regExpOrStringOrSyntax    === "function" &&
-            typeof regExpOrStringOrSyntax.is === "function"
-        );
-        const isRegExp = (
-            regExpOrStringOrSyntax instanceof RegExp
-        );
-
-        if ( isSyntax ) {
+        if ( typeof regExpOrStringOrSyntax    === "function" ) {
             const ChildSyntax = regExpOrStringOrSyntax;
-
-            return ChildSyntax.is(this, str, options);
+            const syntax = new ChildSyntax();
+            return syntax.is(this, str, options);
         }
 
-        else if ( isString ) {
+        else if ( typeof regExpOrStringOrSyntax === "string" ) {
             const testString = regExpOrStringOrSyntax;
 
             return str.indexOf(testString) === 0;
         }
 
-        else if ( isRegExp ) {
+        else if ( regExpOrStringOrSyntax instanceof RegExp ) {
             const regExp = regExpOrStringOrSyntax;
 
             return str.search(regExp) === 0;
@@ -116,7 +90,7 @@ export class Coach {
         }
     }
 
-    isWord(word) {
+    isWord(word: string): boolean {
         if ( word == null ) {
             return this.is(/\w/i);
         }
@@ -128,7 +102,7 @@ export class Coach {
         return currentWord.toLowerCase() === word;
     }
 
-    read(regExp) {
+    read(regExp: RegExp): string {
         const str = this.str.slice(this.i);
         const execResult = regExp.exec(str);
 
@@ -140,7 +114,7 @@ export class Coach {
         return execResult[0];
     }
 
-    getPosition() {
+    getPosition(): IPosition {
         const index = this.i;
         
         const lines = this.str.slice(0, index)
@@ -170,7 +144,7 @@ export class Coach {
     }
 
     
-    throwError(message) {
+    throwError(message: string): void {
         const position = this.getPosition();
 
         const nearString = this.str.slice(Math.max(position.index, 0), position.index + 30);
@@ -182,7 +156,7 @@ export class Coach {
         );
     }
 
-    expect(strOrRegExp, message) {
+    expect(strOrRegExp: string | RegExp, message?: string): string {
         if ( typeof strOrRegExp === "string" ) {
             const str = strOrRegExp;
 
@@ -214,7 +188,7 @@ export class Coach {
     }
 
     
-    expectWord(word?) {
+    expectWord(word?: string): string {
         const i = this.i;
 
         const currentWord = this.readWord();
@@ -236,7 +210,7 @@ export class Coach {
         this.throwError("expected word: " + word);
     }
 
-    parseUnicode(unicode) {
+    parseUnicode(unicode: string): string {
         try {
             // unicode can be valid js code
             if ( !/^[\dabcdef]+$/i.test(unicode) ) {
@@ -252,7 +226,7 @@ export class Coach {
         return unicode;
     }
 
-    isEnd() {
+    isEnd(): boolean {
         return this.i >= this.str.length;
     }
 
@@ -264,23 +238,16 @@ export class Coach {
     //    is: function,
     //    parse: function
     // }
-    parseComma(SyntaxName, options?) {
-        const elements = [];
-
-        const parseSyntax = this[ "parse" + SyntaxName ].bind(this, options);
-        const isSyntax = this[ "is" + SyntaxName ].bind(this, options);
-
-        this._parseComma(SyntaxName, isSyntax, parseSyntax, elements);
-
-        return elements;
-    }
-
-    _parseComma(SyntaxName, isSyntax, parseSyntax, elements) {
-        if ( !isSyntax() ) {
-            this.throwError("expected: " + SyntaxName);
+    parseComma<K extends keyof this["syntax"], T extends this["syntax"][K]>(
+        SomeSyntax: T, 
+        options?: IAnyObject,
+        elements: Array<InstanceType<T>> = []
+    ): Array<InstanceType<T>> {
+        if ( !this.is(SomeSyntax, options) ) {
+            this.throwError("expected: " + SomeSyntax.name);
         }
 
-        const elem = parseSyntax();
+        const elem = this.parse(SomeSyntax, options);
         elements.push( elem );
 
         if ( this.is(/\s*,/) ) {
@@ -288,7 +255,7 @@ export class Coach {
             this.i++; // ,
             this.skipSpace();
 
-            this._parseComma(SyntaxName, isSyntax, parseSyntax, elements);
+            this.parseComma(SomeSyntax, options, elements);
         }
     
         return elements;
@@ -303,26 +270,20 @@ export class Coach {
     //    is: function,
     //    parse: function
     // }
-    parseChain(SyntaxName, options?) {
-        const elements = [];
+    parseChain<K extends keyof this["syntax"], T extends this["syntax"][K]>(
+        SomeSyntax: T, 
+        options?: IAnyObject,
+        elements: Array<InstanceType<T>> = []
+    ): Array<InstanceType<T>> {
 
-        const parseSyntax = this[ "parse" + SyntaxName ].bind(this, options);
-        const isSyntax = this[ "is" + SyntaxName ].bind(this, options);
-
-        this._parseChain(isSyntax, parseSyntax, elements);
-
-        return elements;
-    }
-
-    _parseChain(isSyntax, parseSyntax, elements) {
         const i = this.i;
         this.skipSpace();
 
-        if ( isSyntax() ) {
-            const elem = parseSyntax();
+        if ( this.is(SomeSyntax, options) ) {
+            const elem = this.parse(SomeSyntax, options);
             elements.push( elem );
 
-            this._parseChain(isSyntax, parseSyntax, elements);
+            this.parseChain(SomeSyntax, options, elements);
         } else {
             this.i = i;
         }
@@ -330,4 +291,14 @@ export class Coach {
         return elements;
     }
 
+    parse<K extends keyof this["syntax"], T extends this["syntax"][K]>(
+        SomeSyntax: T,
+        options?: IAnyObject
+    ): InstanceType<T> {
+        const syntax: InstanceType<T> = new SomeSyntax() as any;
+        const data = {};
+        syntax.parse(this, data, options);
+        syntax.set(data);
+        return syntax;
+    }
 }

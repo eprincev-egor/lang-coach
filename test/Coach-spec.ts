@@ -22,8 +22,12 @@ describe("Coach tests", () => {
     });
 
     it("coach.is(Syntax)", () => {
-        class ChildSyntax extends Syntax<any> {
-            static is(coach2) {
+        class ChildSyntax extends Syntax<ChildSyntax> {
+            structure() {
+                return {};
+            }
+
+            is(coach2) {
                 return coach2.is("1");
             }
         }
@@ -38,8 +42,12 @@ describe("Coach tests", () => {
     });
 
     it("coach.is(Syntax, options)", () => {
-        class ChildSyntax extends Syntax<any> {
-            static is(coach2, str, options) {
+        class ChildSyntax extends Syntax<ChildSyntax> {
+            structure() {
+                return {};
+            }
+
+            is(coach2, str, options) {
                 options = options || {alphabet: false};
 
                 return (
@@ -396,50 +404,48 @@ describe("Coach tests", () => {
 
     it("Coach.syntax", () => {
         class AnyWord extends Syntax<AnyWord> {
-            static is(coach2) {
-                return coach2.isWord();
-            }
-
-            static parse(coach2, data) {
-                data.word = coach2.expectWord();
-            }
-
             structure() {
                 return {
                     word: Types.String
                 };
             }
+
+            is(coach2) {
+                return coach2.isWord();
+            }
+
+            parse(coach2, data) {
+                data.word = coach2.expectWord();
+            }
         }
         
 
-        class SomeLang extends Coach {}
-        SomeLang.syntax( AnyWord );
+        class SomeLang extends Coach {
+            syntax = {
+                AnyWord
+            };
+        }
 
 
         const coach = new SomeLang("any");
 
-        assert.ok( (coach as any).isAnyWord() );
+        assert.ok( coach.is(AnyWord) );
 
-        const syntax = (coach as any).parseAnyWord();
+        const syntax = coach.parse(AnyWord);
 
         assert.ok( syntax instanceof AnyWord );
         assert.ok( syntax instanceof Model );
 
         assert.ok( syntax.get("word") === "any" );
-
-
-        assert.throws(
-            () => {
-                SomeLang.syntax( false );
-            }, 
-            (err) =>
-                err.message === "Syntax must be class"
-        );
     });
 
-    it("coach.isSyntax(options)", () => {
-        class Some extends Syntax<any> {
-            static is(coach2, str, options) {
+    it("coach.is(Syntax, options)", () => {
+        class Some extends Syntax<Some> {
+            structure() {
+                return {};
+            }
+
+            is(coach2, str, options) {
                 options = options || {alphabet: false};
 
                 return (
@@ -451,32 +457,26 @@ describe("Coach tests", () => {
             }
         }
 
-        class SomeLang extends Coach {}
-        SomeLang.syntax( Some );
+        class SomeLang extends Coach {
+            syntax = {
+                Some
+            };
+        }
 
-        let coach;
+        let coach: SomeLang;
         
         coach = new SomeLang("1");
-        assert.ok( coach.isSome() );
+        assert.ok( coach.is(Some) );
 
         coach = new SomeLang("a");
-        assert.ok( !coach.isSome() );
+        assert.ok( !coach.is(Some) );
 
         coach = new SomeLang("a");
-        assert.ok( coach.isSome({ alphabet: true }) );
+        assert.ok( coach.is(Some, { alphabet: true }) );
     });
 
-    it("coach.parseComma('SyntaxName', options)", () => {
+    it("coach.parseComma(Syntax, options)", () => {
         class AnyWord extends Syntax<AnyWord> {
-
-            static is(coach2) {
-                return coach2.isWord();
-            }
-
-            static parse(coach2, data, options) {
-                data.options = JSON.stringify(options);
-                data.word = coach2.expectWord();
-            }
 
             structure() {
                 return {
@@ -484,14 +484,26 @@ describe("Coach tests", () => {
                     word: Types.String
                 };
             }
+
+            is(coach2) {
+                return coach2.isWord();
+            }
+
+            parse(coach2, data, options) {
+                data.options = JSON.stringify(options);
+                data.word = coach2.expectWord();
+            }
         }
 
-        class SomeLang extends Coach {}
-        SomeLang.syntax( AnyWord );
+        class SomeLang extends Coach {
+            syntax = {
+                AnyWord
+            };
+        }
 
         let coach = new SomeLang("one,\r two\n,\tthree  some");
 
-        let result = coach.parseComma("AnyWord");
+        let result = coach.parseComma(AnyWord);
 
         assert.equal(result.length, 3);
 
@@ -512,7 +524,7 @@ describe("Coach tests", () => {
 
         // run with options
         coach = new SomeLang("one,\r two\n,\tthree  !!!");
-        result = coach.parseComma("AnyWord", {x: 1});
+        result = coach.parseComma(AnyWord, {x: 1});
 
 
         assert.equal( result[0].get("options"), "{\"x\":1}" );
@@ -523,17 +535,23 @@ describe("Coach tests", () => {
         assert.throws(
             () => {
                 coach = new SomeLang("!!");
-                result = coach.parseComma("AnyWord");
+                result = coach.parseComma(AnyWord);
             },
             (err) =>
                 /expected: AnyWord/.test( err.message )
         );
     });
 
-    it("coach.parseComma('SyntaxName', options), check options in call: coach.is()", () => {
+    it("coach.parseComma(Syntax, options), check options in call: coach.is()", () => {
         class AnyWord extends Syntax<AnyWord> {
 
-            static is(coach2, str, options) {
+            structure() {
+                return {
+                    word: Types.String
+                };
+            }
+
+            is(coach2, str, options) {
                 options = options || {numbers: false};
                 return (
                     coach2.is(/[a-z]/) ||
@@ -543,7 +561,7 @@ describe("Coach tests", () => {
                 );
             }
 
-            static parse(coach2, data, options) {
+            parse(coach2, data, options) {
                 options = options || {numbers: false};
 
                 if ( options.numbers ) {
@@ -552,19 +570,17 @@ describe("Coach tests", () => {
                     data.word = coach2.expect(/[a-z]+/);
                 }
             }
-            structure() {
-                return {
-                    word: Types.String
-                };
-            }
         }
 
-        class SomeLang extends Coach {}
-        SomeLang.syntax( AnyWord );
+        class SomeLang extends Coach {
+            syntax = {
+                AnyWord
+            };
+        }
 
         let coach = new SomeLang("1, 2, 3");
 
-        let result = coach.parseComma("AnyWord", {
+        let result = coach.parseComma(AnyWord, {
             numbers: true
         });
 
@@ -577,7 +593,7 @@ describe("Coach tests", () => {
         // without options
         coach = new SomeLang("some, word");
 
-        result = coach.parseComma("AnyWord");
+        result = coach.parseComma(AnyWord);
         assert.equal( result.length, 2 );
         assert.equal( result[0].get("word"), "some" );
         assert.equal( result[1].get("word"), "word" );
@@ -586,28 +602,32 @@ describe("Coach tests", () => {
     it("coach.parseChain('SyntaxName')", () => {
         class AnyWord extends Syntax<AnyWord> {
 
-            static is(coach2) {
-                return coach2.isWord();
-            }
-
-            static parse(coach2, data, options) {
-                data.options = JSON.stringify(options);
-                data.word = coach.expectWord();
-            }
             structure() {
                 return {
                     options: Types.String,
                     word: Types.String
                 };
             }
+
+            is(coach2) {
+                return coach2.isWord();
+            }
+
+            parse(coach2, data, options) {
+                data.options = JSON.stringify(options);
+                data.word = coach.expectWord();
+            }
         }
 
-        class SomeLang extends Coach {}
-        SomeLang.syntax( AnyWord );
+        class SomeLang extends Coach {
+            syntax = {
+                AnyWord
+            };
+        }
 
         let coach = new SomeLang("one\r two\n \tthree  !!!");
 
-        let result = coach.parseChain("AnyWord");
+        let result = coach.parseChain(AnyWord);
 
         assert.equal(result.length, 3);
 
@@ -628,7 +648,7 @@ describe("Coach tests", () => {
 
         // run with options
         coach = new SomeLang("one\r two\n \tthree  !!!");
-        result = coach.parseChain("AnyWord", {x: 1});
+        result = coach.parseChain(AnyWord, {x: 1});
 
         assert.equal( result[0].get("options"), "{\"x\":1}" );
         assert.equal( result[1].get("options"), "{\"x\":1}" );
@@ -638,7 +658,13 @@ describe("Coach tests", () => {
     it("coach.parseChain('SyntaxName', options), check options in call: coach.is()", () => {
         class AnyWord extends Syntax<AnyWord> {
 
-            static is(coach2, str, options) {
+            structure() {
+                return {
+                    word: Types.String
+                };
+            }
+
+            is(coach2, str, options) {
                 options = options || {numbers: false};
                 return (
                     coach2.is(/[a-z]/) ||
@@ -648,7 +674,7 @@ describe("Coach tests", () => {
                 );
             }
 
-            static parse(coach2, data, options) {
+            parse(coach2, data, options) {
                 options = options || {numbers: false};
 
                 if ( options.numbers ) {
@@ -657,19 +683,17 @@ describe("Coach tests", () => {
                     data.word = coach2.expect(/[a-z]+/);
                 }
             }
-            structure() {
-                return {
-                    word: Types.String
-                };
-            }
         }
 
-        class SomeLang extends Coach {}
-        SomeLang.syntax( AnyWord );
+        class SomeLang extends Coach {
+            syntax = {
+                AnyWord
+            };
+        }
 
         let coach = new SomeLang("1 2 3");
 
-        let result = coach.parseChain("AnyWord", {
+        let result = coach.parseChain(AnyWord, {
             numbers: true
         });
 
@@ -682,7 +706,7 @@ describe("Coach tests", () => {
         // without options
         coach = new SomeLang("some 1");
 
-        result = coach.parseChain("AnyWord");
+        result = coach.parseChain(AnyWord);
 
         assert.equal( result.length, 1 );
         assert.equal( result[0].get("word"), "some" );
