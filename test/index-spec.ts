@@ -1,4 +1,4 @@
-import {Syntax, Coach} from "../lib/index";
+import {Syntax, Coach, Types} from "../lib/index";
 import assert from "assert";
 
 describe("index tests", () => {
@@ -7,6 +7,7 @@ describe("index tests", () => {
 
         assert.ok( Syntax );
         assert.ok( Coach );
+        assert.ok( Types );
 
     });
 
