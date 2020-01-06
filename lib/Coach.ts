@@ -295,6 +295,27 @@ export class Coach {
         SomeSyntax: T,
         options?: IAnyObject
     ): InstanceType<T> {
+        // first call parse
+        // need set reference to all syntax classes inside every syntax
+        // (impossible make it inside constructor)
+        if ( !this.constructor.prototype.hasOwnProperty("_prepared") ) {
+            // speedup next call: .parse()
+            this.parse = this.parseMain.bind(this);
+
+            this.constructor.prototype._prepared = true;
+            for (const key in this.syntax) {
+                const ChildSyntax = this.syntax[key];
+                ChildSyntax.prototype.syntax = this.syntax;
+            }
+        }
+
+        return this.parseMain(SomeSyntax, options);
+    }
+
+    private parseMain<K extends keyof this["syntax"], T extends this["syntax"][K]>(
+        SomeSyntax: T,
+        options?: IAnyObject
+    ): InstanceType<T> {
         const syntax: InstanceType<T> = new SomeSyntax() as any;
         const data = {};
         syntax.parse(this, data, options);

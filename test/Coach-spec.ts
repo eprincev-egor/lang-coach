@@ -712,4 +712,53 @@ describe("Coach tests", () => {
         assert.equal( result[0].get("word"), "some" );
     });
 
+    it("someSyntax.syntax references to all syntax", () => {
+        class Word extends Syntax<Word> {
+            structure() {
+                return {
+                    word: Types.String
+                };
+            }
+
+            is(coach2) {
+                return coach2.is(/[a-z]+/);
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.word = coach2.expect(/[a-z]+/);
+            }
+        }
+
+        class Phrase extends Syntax<Phrase> {
+            structure() {
+                return {
+                    words: Types.Array({
+                        element: this.syntax.Word
+                    })
+                };
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.words = coach.parseChain(Word);
+            }
+        }
+
+        class SomeLang extends Coach {
+            syntax = {
+                Word,
+                Phrase
+            };
+        }
+
+        const coach = new SomeLang("hello world");
+        const phrase = coach.parse(Phrase);
+
+        assert.deepStrictEqual(phrase.toJSON(), {
+            words: [
+                {word: "hello"},
+                {word: "world"}
+            ]
+        });
+    });
+
 });
