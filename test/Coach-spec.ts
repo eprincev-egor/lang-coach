@@ -113,7 +113,7 @@ describe("Coach tests", () => {
     });
 
     it("coach.isWord()", () => {
-        let coach;
+        let coach: Coach;
 
         coach = new Coach("Hello");
 

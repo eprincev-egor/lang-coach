@@ -90,7 +90,7 @@ export class Coach {
         }
     }
 
-    isWord(word: string): boolean {
+    isWord(word?: string): boolean {
         if ( word == null ) {
             return this.is(/\w/i);
         }
