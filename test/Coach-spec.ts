@@ -739,7 +739,7 @@ describe("Coach tests", () => {
             }
 
             parse(coach2: SomeLang, data: this["TInputData"]) {
-                data.words = coach.parseChain(Word);
+                data.words = coach2.parseChain(Word);
             }
         }
 
@@ -759,6 +759,57 @@ describe("Coach tests", () => {
                 {word: "world"}
             ]
         });
+    });
+
+    it("someSyntax.syntax references to all syntax, check methods is", () => {
+        class Word extends Syntax<Word> {
+            structure() {
+                return {
+                    word: Types.String
+                };
+            }
+
+            is(coach2) {
+                return coach2.is(/[a-z]+/);
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.word = coach2.expect(/[a-z]+/);
+            }
+        }
+
+        class Phrase extends Syntax<Phrase> {
+            structure() {
+                return {
+                    words: Types.Array({
+                        element: this.syntax.Word
+                    })
+                };
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.words = coach2.parseChain(Word);
+            }
+
+            is(coach2: SomeLang) {
+                return coach2.is( this.syntax.Word as SomeLang["syntax"]["Word"] );
+            }
+        }
+
+        class SomeLang extends Coach {
+            syntax = {
+                Word,
+                Phrase
+            };
+        }
+
+        // testing IS
+        const coach = new SomeLang("phrase");
+
+        assert.strictEqual(
+            coach.is(Phrase),
+            true
+        );
     });
 
 });

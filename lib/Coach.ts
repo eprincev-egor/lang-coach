@@ -61,8 +61,20 @@ export class Coach {
     is<K extends keyof this["syntax"]>(Syntax: this["syntax"][K], options?: IAnyObject): boolean;
     is<K extends keyof this["syntax"]>(
         regExpOrStringOrSyntax: string | 
-        RegExp | 
-        this["syntax"][K], 
+            RegExp | 
+            this["syntax"][K], 
+        options?: IAnyObject
+    ): boolean {
+        this.setSyntaxReference();
+        return this.isMain(regExpOrStringOrSyntax as any, options);
+    }
+
+    isMain(strOrRegExp: string | RegExp, options?: IAnyObject): boolean;
+    isMain<K extends keyof this["syntax"]>(Syntax: this["syntax"][K], options?: IAnyObject): boolean;
+    isMain<K extends keyof this["syntax"]>(
+        regExpOrStringOrSyntax: string | 
+            RegExp | 
+            this["syntax"][K], 
         options?: IAnyObject
     ): boolean {
         const str = this.str.slice(this.i);
@@ -295,21 +307,26 @@ export class Coach {
         SomeSyntax: T,
         options?: IAnyObject
     ): InstanceType<T> {
+        this.setSyntaxReference();
+        return this.parseMain(SomeSyntax, options);
+    }
+
+    private setSyntaxReference() {
         // first call parse
         // need set reference to all syntax classes inside every syntax
         // (impossible make it inside constructor)
-        if ( !this.constructor.prototype.hasOwnProperty("_prepared") ) {
-            // speedup next call: .parse()
-            this.parse = this.parseMain.bind(this);
-
-            this.constructor.prototype._prepared = true;
-            for (const key in this.syntax) {
-                const ChildSyntax = this.syntax[key];
-                ChildSyntax.prototype.syntax = this.syntax;
-            }
+        if ( this.constructor.prototype.hasOwnProperty("_prepared") ) {
+            return;
         }
+        // speedup next call: .parse()
+        this.parse = this.parseMain.bind(this);
+        this.is = this.isMain.bind(this);
 
-        return this.parseMain(SomeSyntax, options);
+        this.constructor.prototype._prepared = true;
+        for (const key in this.syntax) {
+            const ChildSyntax = this.syntax[key];
+            ChildSyntax.prototype.syntax = this.syntax;
+        }
     }
 
     private parseMain<K extends keyof this["syntax"], T extends this["syntax"][K]>(
