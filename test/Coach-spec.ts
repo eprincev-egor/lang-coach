@@ -812,4 +812,35 @@ describe("Coach tests", () => {
         );
     });
 
+    it("WordSyntax has required field and we call coach.is(Word)", () => {
+        class Word extends Syntax<Word> {
+            structure() {
+                return {
+                    word: Types.String({
+                        required: true
+                    })
+                };
+            }
+
+            is(coach2) {
+                return coach2.is(/[a-z]+/);
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.word = coach2.expect(/[a-z]+/);
+            }
+        }
+
+        class SomeLang extends Coach {
+            syntax = {
+                Word
+            };
+        }
+
+        const coach = new SomeLang("hello world");
+
+        assert.strictEqual(coach.is(Word), true);
+    });
+
+
 });

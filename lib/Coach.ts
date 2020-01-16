@@ -81,8 +81,9 @@ export class Coach {
 
         if ( typeof regExpOrStringOrSyntax    === "function" ) {
             const ChildSyntax = regExpOrStringOrSyntax;
-            const syntax = new ChildSyntax();
-            return syntax.is(this, str, options);
+            return ChildSyntax.prototype.is.call({
+                syntax: ChildSyntax.prototype.syntax
+            }, this, str, options);
         }
 
         else if ( typeof regExpOrStringOrSyntax === "string" ) {
