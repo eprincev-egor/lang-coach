@@ -36,7 +36,7 @@
   "author": "Eprincev Egor",
   "license": "ISC",
   "dependencies": {
-    "model-layer": "^2.0.2"
+    "model-layer": "^2.0.3"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
