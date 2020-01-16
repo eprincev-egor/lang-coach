@@ -1,6 +1,6 @@
 {
   "name": "lang-coach",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "description": "libary for parsing languages",
   "main": "dist/index.js",
   "types": "lib/index.ts",
@@ -48,5 +48,9 @@
     "tsc": "^1.20150623.0",
     "tslint": "^5.18.0",
     "typescript": "^3.7.2"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
   }
 }
