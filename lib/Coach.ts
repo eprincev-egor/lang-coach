@@ -81,9 +81,8 @@ export class Coach {
 
         if ( typeof regExpOrStringOrSyntax    === "function" ) {
             const ChildSyntax = regExpOrStringOrSyntax;
-            return ChildSyntax.prototype.is.call({
-                syntax: ChildSyntax.prototype.syntax
-            }, this, str, options);
+            const tmpSyntax = Object.create(ChildSyntax.prototype);
+            return tmpSyntax.is(this, str, options);
         }
 
         else if ( typeof regExpOrStringOrSyntax === "string" ) {
@@ -334,10 +333,9 @@ export class Coach {
         SomeSyntax: T,
         options?: IAnyObject
     ): InstanceType<T> {
-        const syntax: InstanceType<T> = new SomeSyntax() as any;
+        const tmpSyntax = Object.create(SomeSyntax.prototype);
         const data = {};
-        syntax.parse(this, data, options);
-        syntax.set(data);
-        return syntax;
+        tmpSyntax.parse(this, data, options);
+        return new SomeSyntax(data) as any;
     }
 }
