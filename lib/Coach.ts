@@ -10,6 +10,9 @@ interface IPosition {
     column: number;
 }
 
+// mac, windows, linux
+const EOL_REG_EXP = /\r\n?|\n/;
+
 export class Coach {
     
     public str: string;
@@ -129,9 +132,7 @@ export class Coach {
     getPosition(): IPosition {
         const index = this.i;
         
-        const lines = this.str.slice(0, index)
-            // mac, windows, linux
-            .split(/\r\n?|\n/);
+        const lines = this.str.slice(0, index) .split(EOL_REG_EXP);
         
         const line = lines.length;
 
@@ -155,16 +156,99 @@ export class Coach {
         };
     }
 
+    getNearLines(linesCount: number): {
+        currentLineIndex: number, 
+        lines: string[]
+    } {
+        if ( linesCount % 2 === 0 ) {
+            throw new Error("linesCount should be odd");
+        }
+
+        const half = Math.floor( linesCount / 2 );
+
+        const prevLines = this.str.slice(0, this.i).split(EOL_REG_EXP);
+        const nextLines = this.str.slice(this.i).split(EOL_REG_EXP);
+        const currentLine = prevLines.pop() + nextLines.shift();
+        const nearLines: string[] = [];
+        // current line index inside array nearLines
+        let currentLineIndex = half;
+
+        if ( half ) {
+            nearLines.push(
+                ...prevLines.slice( -half )
+            );
+        }
+        
+        nearLines.push( currentLine );
+
+        if ( half ) {
+            nearLines.push(
+                ...nextLines.slice( 0, half )
+            );
+        }
+
+        if ( half && prevLines.length < half ) {
+            const needLinesCount = half - prevLines.length;
+            nearLines.push(
+                ...nextLines.slice( half, half + needLinesCount )
+            );
+
+            currentLineIndex -= needLinesCount;
+        }
+
+        else if ( half && nextLines.length < half ) {
+            const needLinesCount = half - nextLines.length;
+            const endIndex = prevLines.length - half;
+
+            nearLines.unshift(
+                ...prevLines.slice( 
+                    endIndex - needLinesCount,
+                    endIndex
+                )
+            );
+
+            currentLineIndex += needLinesCount;
+        }
+
+        return {
+            currentLineIndex,
+            lines: nearLines
+        };
+    }
+
     
     throwError(message: string): void {
         const position = this.getPosition();
 
-        const nearString = this.str.slice(Math.max(position.index, 0), position.index + 30);
+        const near = this.getNearLines(5);
+        const maxLineNumber = position.line + near.lines.length - near.currentLineIndex;
+        const nearString = near.lines.map((line, i) => {
+            const lineNumber = position.line - near.currentLineIndex + i;
+            const isCurrent = (
+                i === near.currentLineIndex ? 
+                    ">" : 
+                    " "
+            );
+
+            // calculating zeroSpaces for lines 7,8,9
+            // "\n   7 | line # 7" +
+            // "\n   8 | line # 8" +
+            // "\n>  9 | line # 9" +
+            // "\n  10 | line # 10" +
+            // "\n  11 | line # 11" +
+            let zeroSpaces = "";
+            for (let j = (lineNumber + "").length; j < (maxLineNumber + "").length; j++) {
+                zeroSpaces += " ";
+            }
+
+            return `\n${isCurrent} ${zeroSpaces}${lineNumber} |${ line }`;
+        }).join("");
+
         throw new Error(
             "SyntaxError at line " + position.line +
-                ", column " + position.column +
-                ", at near `" + nearString + "`" +
-                "\n Message: " + message
+                ", column " + position.column + "\n" +
+                nearString +
+                "\n\n Message: " + message
         );
     }
 

@@ -218,20 +218,149 @@ describe("Coach tests", () => {
         );
     });
 
-    it("coach.throwError(message)", () => {
-        const coach = new Coach("some\nstring");
+    it("coach.getNearLines()", () => {
+        const coach = new Coach("line 1\nline 2\rline 3\r\nline 4\nline 5\nline 6");
 
-        coach.readWord();
+        coach.i = 0;
+        assert.deepStrictEqual(
+            coach.getNearLines(3),
+            {currentLineIndex: 0, lines: [
+                "line 1",
+                "line 2",
+                "line 3"
+            ]}
+        );
+
+        coach.i = 0;
+        assert.deepStrictEqual(
+            coach.getNearLines(5),
+            {currentLineIndex: 0, lines: [
+                "line 1",
+                "line 2",
+                "line 3",
+                "line 4",
+                "line 5"
+            ]}
+        );
+
+
+        coach.i = 27;
+        assert.deepStrictEqual(
+            coach.getNearLines(3),
+            {currentLineIndex: 1, lines: [
+                "line 3",
+                "line 4",
+                "line 5"
+            ]}
+        );
+
+        coach.i = 27;
+        assert.deepStrictEqual(
+            coach.getNearLines(1),
+            {currentLineIndex: 0, lines: [
+                "line 4"
+            ]}
+        );
+
+        coach.i = coach.str.length;
+        assert.deepStrictEqual(
+            coach.getNearLines(3),
+            {currentLineIndex: 2, lines: [
+                "line 4",
+                "line 5",
+                "line 6"
+            ]}
+        );
+
+        coach.i = coach.str.length;
+        assert.deepStrictEqual(
+            coach.getNearLines(5),
+            {currentLineIndex: 4, lines: [
+                "line 2",
+                "line 3",
+                "line 4",
+                "line 5",
+                "line 6"
+            ]}
+        );
 
         assert.throws(
             () => {
+                coach.getNearLines(2);
+            },
+            (err) =>
+                /linesCount should be odd/.test(err.message)
+        );
+    });
+
+    it("coach.throwError(message)", () => {
+        
+        assert.throws(
+            () => {
+                const coach = new Coach("some\nstring\nwith\nerror");
+
+                coach.readWord();
                 coach.throwError("test");
             }, 
             (err) =>
                 err.message === "SyntaxError at line 2" +
                     ", column 1" +
-                    ", at near `string`" +
-                    "\n Message: test"
+                    "\n" +
+                    "\n  1 |some" +
+                    "\n> 2 |string" +
+                    "\n  3 |with" +
+                    "\n  4 |error" +
+                    "\n\n Message: test"
+        );
+
+        
+        assert.throws(
+            () => {
+                let testString = "";
+                for (let i = 0; i < 100; i++) {
+                    testString += " line # " + (i + 1);
+                    testString += "\r\n";
+                }
+                const coach = new Coach(testString);
+
+                coach.i = 666;
+                coach.expectWord("test");
+            }, 
+            (err) =>
+                err.message === "SyntaxError at line 57" +
+                    ", column 4" +
+                    "\n" +
+                    "\n  55 | line # 55" +
+                    "\n  56 | line # 56" +
+                    "\n> 57 | line # 57" +
+                    "\n  58 | line # 58" +
+                    "\n  59 | line # 59" +
+                    "\n\n Message: expected word: test"
+        );
+
+        
+        assert.throws(
+            () => {
+                let testString = "";
+                for (let i = 0; i < 100; i++) {
+                    testString += " line # " + (i + 1);
+                    testString += "\r\n";
+                }
+                const coach = new Coach(testString);
+
+                coach.i = 90;
+                coach.expectWord("test");
+            }, 
+            (err) =>
+                err.message === "SyntaxError at line 9" +
+                    ", column 3" +
+                    "\n" +
+                    "\n   7 | line # 7" +
+                    "\n   8 | line # 8" +
+                    "\n>  9 | line # 9" +
+                    "\n  10 | line # 10" +
+                    "\n  11 | line # 11" +
+                    "\n\n Message: expected word: test"
         );
     });
 
@@ -257,8 +386,9 @@ describe("Coach tests", () => {
             (err) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
-                    ", at near `some text`" +
-                    "\n Message: expected: text"
+                    "\n" +
+                    "\n> 1 |some text" +
+                    "\n\n Message: expected: text"
         );
         assert.ok( coach.is("some") );
 
@@ -268,10 +398,11 @@ describe("Coach tests", () => {
                 coach.expect("text", "custom error message");
             }, 
             (err) =>
-                err.message === "SyntaxError at line 1" +
-                    ", column 0" +
-                    ", at near `some text`" +
-                    "\n Message: custom error message"
+            err.message === "SyntaxError at line 1" +
+                ", column 0" +
+                "\n" +
+                "\n> 1 |some text" +
+                "\n\n Message: custom error message"
         );
     });
 
@@ -296,8 +427,9 @@ describe("Coach tests", () => {
             (err) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
-                    ", at near `some text`" +
-                    "\n Message: expected: /text/"
+                    "\n" +
+                    "\n> 1 |some text" +
+                    "\n\n Message: expected: /text/"
         );
         assert.ok( coach.is("some") );
 
@@ -309,8 +441,9 @@ describe("Coach tests", () => {
             (err) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
-                    ", at near `some text`" +
-                    "\n Message: custom error text"
+                    "\n" +
+                    "\n> 1 |some text" +
+                    "\n\n Message: custom error text"
         );
     });
 
@@ -336,8 +469,9 @@ describe("Coach tests", () => {
             (err) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
-                    ", at near `wrong`" +
-                    "\n Message: expected word: some"
+                    "\n" +
+                    "\n> 1 |wrong" +
+                    "\n\n Message: expected word: some"
         );
         assert.ok( coach.is("wrong") );
     });
@@ -364,8 +498,9 @@ describe("Coach tests", () => {
             (err) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
-                    ", at near `***`" +
-                    "\n Message: expected any word"
+                    "\n" +
+                    "\n> 1 |***" +
+                    "\n\n Message: expected any word"
         );
         assert.ok( coach.is("***") );
     });
@@ -384,8 +519,9 @@ describe("Coach tests", () => {
             (err) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
-                    ", at near ``" +
-                    "\n Message: invalid unicode sequence: ***"
+                    "\n" +
+                    "\n> 1 |" +
+                    "\n\n Message: invalid unicode sequence: ***"
         );
     });
 
