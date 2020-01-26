@@ -1,9 +1,5 @@
 import {Syntax} from "./Syntax";
 
-interface IAnyObject {
-    [key: string]: any;
-}
-
 interface IPosition {
     index: number;
     line: number;
@@ -60,25 +56,31 @@ export class Coach {
     }
 
     // test string (from current place) on regExp
-    is(strOrRegExp: string | RegExp, options?: IAnyObject): boolean;
-    is<K extends keyof this["syntax"]>(Syntax: this["syntax"][K], options?: IAnyObject): boolean;
+    is(strOrRegExp: string | RegExp): boolean;
+    is<K extends keyof this["syntax"]>(
+        Syntax: this["syntax"][K], 
+        options?: InstanceType<this["syntax"][K]>["IOptions"]
+    ): boolean;
     is<K extends keyof this["syntax"]>(
         regExpOrStringOrSyntax: string | 
             RegExp | 
             this["syntax"][K], 
-        options?: IAnyObject
+        options?: InstanceType<this["syntax"][K]>["IOptions"]
     ): boolean {
         this.setSyntaxReference();
         return this.isMain(regExpOrStringOrSyntax as any, options);
     }
 
-    isMain(strOrRegExp: string | RegExp, options?: IAnyObject): boolean;
-    isMain<K extends keyof this["syntax"]>(Syntax: this["syntax"][K], options?: IAnyObject): boolean;
+    isMain(strOrRegExp: string | RegExp): boolean;
+    isMain<K extends keyof this["syntax"]>(
+        Syntax: this["syntax"][K], 
+        options?: InstanceType<this["syntax"][K]>["IOptions"]
+    ): boolean;
     isMain<K extends keyof this["syntax"]>(
         regExpOrStringOrSyntax: string | 
             RegExp | 
             this["syntax"][K], 
-        options?: IAnyObject
+        options?: InstanceType<this["syntax"][K]>["IOptions"]
     ): boolean {
         const str = this.str.slice(this.i);
 
@@ -336,7 +338,7 @@ export class Coach {
     // }
     parseComma<K extends keyof this["syntax"], T extends this["syntax"][K]>(
         SomeSyntax: T, 
-        options?: IAnyObject,
+        options?: InstanceType<T>["IOptions"],
         elements: Array<InstanceType<T>> = []
     ): Array<InstanceType<T>> {
         if ( !this.is(SomeSyntax, options) ) {
@@ -368,7 +370,7 @@ export class Coach {
     // }
     parseChain<K extends keyof this["syntax"], T extends this["syntax"][K]>(
         SomeSyntax: T, 
-        options?: IAnyObject,
+        options?: InstanceType<T>["IOptions"],
         elements: Array<InstanceType<T>> = []
     ): Array<InstanceType<T>> {
 
@@ -389,7 +391,7 @@ export class Coach {
 
     parse<K extends keyof this["syntax"], T extends this["syntax"][K]>(
         SomeSyntax: T,
-        options?: IAnyObject
+        options?: InstanceType<T>["IOptions"]
     ): InstanceType<T> {
         this.setSyntaxReference();
         return this.parseMain(SomeSyntax, options);
@@ -415,7 +417,7 @@ export class Coach {
 
     private parseMain<K extends keyof this["syntax"], T extends this["syntax"][K]>(
         SomeSyntax: T,
-        options?: IAnyObject
+        options?: InstanceType<T>["IOptions"]
     ): InstanceType<T> {
         const tmpSyntax = Object.create(SomeSyntax.prototype);
         const data = {};
