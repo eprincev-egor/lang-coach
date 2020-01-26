@@ -561,5 +561,66 @@ describe("testSyntax tests", () => {
                 err instanceof AssertionError
         );
     });
+
+    it("testSyntax with options should call methods: is, parse  with same options", () => {
+        let callParseOptions: any = null;
+        let callIsOptions: any = null;
+
+        class Word extends Syntax<Word> {
+            structure() {
+                return {
+                    word: Types.String
+                };
+            }
+
+            is(coach: MyLang, str: string, options) {
+                callIsOptions = options;
+                return coach.isWord();
+            }
+            
+            parse(coach: MyLang, data: this["TInputData"], options) {
+                callParseOptions = options;
+                data.word = coach.readWord();
+            }
+
+            toString() {
+                return this.data.word;
+            }
+        }
+
+        class MyLang extends Coach {
+            syntax = {
+                Word
+            };
+        }
+
+        function test<
+            K extends keyof MyLang["syntax"], 
+            TSyntax extends MyLang["syntax"][K]
+        >(
+            SomeSyntax: TSyntax, 
+            inputTest: ITestResult<InstanceType<TSyntax>>,
+        ) {
+            testSyntax(
+                MyLang,
+                SomeSyntax, 
+                inputTest,
+                localIt
+            );
+        }
+
+        test(Word, {
+            str: "hello",
+            options: {
+                test: true
+            },
+            result: {
+                word: "hello"
+            }
+        });
+
+        assert.deepStrictEqual(callParseOptions, {test: true});
+        assert.deepStrictEqual(callIsOptions, {test: true});
+    });
     
 });
