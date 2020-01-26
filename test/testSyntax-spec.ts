@@ -444,5 +444,122 @@ describe("testSyntax tests", () => {
                 /Missing expected exception/.test(err.message)
         );
     });
+
+    it("test.result can be without some props", () => {
+        class Some extends Syntax<Some> {
+            structure() {
+                return {
+                    x: Types.String({
+                        default: "x"
+                    }),
+                    y: Types.String({
+                        default: "y"
+                    }),
+                    z: Types.Object({
+                        element: Types.Boolean,
+                        default: {
+                            nice: true
+                        }
+                    })
+                };
+            }
+
+            is(coach: MyLang) {
+                return true;
+            }
+            
+            parse(coach: MyLang, data: this["TInputData"]) {
+                data.x = "x";
+                data.y = "y";
+                data.z = {nice: true};
+            }
+
+            /* istanbul ignore next */
+            toString() {
+                return "";
+            }
+        }
+
+        class MyLang extends Coach {
+            syntax = {
+                Some
+            };
+        }
+
+        function test<
+            K extends keyof MyLang["syntax"], 
+            TSyntax extends MyLang["syntax"][K]
+        >(
+            SomeSyntax: TSyntax, 
+            inputTest: ITestResult<InstanceType<TSyntax>>,
+        ) {
+            testSyntax(
+                MyLang,
+                SomeSyntax, 
+                inputTest,
+                localIt
+            );
+        }
+
+        test(Some, {
+            str: "hello",
+            result: {}
+        });
+
+        test(Some, {
+            str: "hello",
+            result: {
+                x: "x"
+            }
+        });
+
+        test(Some, {
+            str: "hello",
+            result: {
+                y: "y"
+            }
+        });
+
+        test(Some, {
+            str: "hello",
+            result: {
+                x: "x",
+                y: "y"
+            }
+        });
+        
+        test(Some, {
+            str: "hello",
+            result: {
+                z: {nice: true}
+            }
+        });
+
+        assert.throws(
+            () => {
+                test(Some, {
+                    str: "hello",
+                    result: {
+                        z: {nice: false}
+                    }
+                });
+            },
+            (err) =>
+                err instanceof AssertionError
+        );
+
+        assert.throws(
+            () => {
+                test(Some, {
+                    str: "hello",
+                    result: {
+                        x: "y"
+                    }
+                });
+            },
+            (err) =>
+                err instanceof AssertionError
+        );
+    });
     
 });

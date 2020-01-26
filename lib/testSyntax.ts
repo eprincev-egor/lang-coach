@@ -70,6 +70,7 @@ export function testSyntax<
     }
     else {
         const test = testAny as ITestResult<InstanceType<TSyntax>>;
+        const shouldBeResult = new SomeSyntax(test.result).toJSON();
 
         it(`testing method coach.is(${ SomeSyntax.name })\n string:\n${str}`, () => {
 
@@ -83,7 +84,7 @@ export function testSyntax<
             
             const coach = new SomeCoach(str);
             const result = coach.parse(SomeSyntax, test.options);
-            assert.deepEqual(test.result, result.toJSON());
+            assert.deepEqual(shouldBeResult, result.toJSON());
         });
 
 
@@ -96,7 +97,7 @@ export function testSyntax<
             const cloneCoach = new SomeCoach( cloneString );
             
             const cloneResult = cloneCoach.parse(SomeSyntax, test.options);
-            assert.deepEqual(test.result, cloneResult.toJSON());
+            assert.deepEqual(shouldBeResult, cloneResult.toJSON());
         });
     }
 
