@@ -23,7 +23,6 @@ describe("Coach tests", () => {
 
     it("coach.is(Syntax)", () => {
         class ChildSyntax extends Syntax<ChildSyntax> {
-            /* istanbul ignore next */
             structure() {
                 return {};
             }
@@ -44,7 +43,6 @@ describe("Coach tests", () => {
 
     it("coach.is(Syntax, options)", () => {
         class ChildSyntax extends Syntax<ChildSyntax> {
-            /* istanbul ignore next */
             structure() {
                 return {};
             }
@@ -579,7 +577,6 @@ describe("Coach tests", () => {
 
     it("coach.is(Syntax, options)", () => {
         class Some extends Syntax<Some> {
-            /* istanbul ignore next */
             structure() {
                 return {};
             }
@@ -902,7 +899,6 @@ describe("Coach tests", () => {
 
     it("someSyntax.syntax references to all syntax, check methods is", () => {
         class Word extends Syntax<Word> {
-            /* istanbul ignore next */
             structure() {
                 return {
                     word: Types.String
@@ -913,14 +909,12 @@ describe("Coach tests", () => {
                 return coach2.is(/[a-z]+/);
             }
 
-            /* istanbul ignore next */
             parse(coach2: SomeLang, data: this["TInputData"]) {
                 data.word = coach2.expect(/[a-z]+/);
             }
         }
 
         class Phrase extends Syntax<Phrase> {
-            /* istanbul ignore next */
             structure() {
                 return {
                     words: Types.Array({
@@ -929,7 +923,6 @@ describe("Coach tests", () => {
                 };
             }
 
-            /* istanbul ignore next */
             parse(coach2: SomeLang, data: this["TInputData"]) {
                 data.words = coach2.parseChain(Word);
             }
@@ -957,7 +950,6 @@ describe("Coach tests", () => {
 
     it("WordSyntax has required field and we call coach.is(Word)", () => {
         class Word extends Syntax<Word> {
-            /* istanbul ignore next */
             structure() {
                 return {
                     word: Types.String({
@@ -970,7 +962,6 @@ describe("Coach tests", () => {
                 return coach2.is(/[a-z]+/);
             }
 
-            /* istanbul ignore next */
             parse(coach2: SomeLang, data: this["TInputData"]) {
                 data.word = coach2.expect(/[a-z]+/);
             }
@@ -989,7 +980,6 @@ describe("Coach tests", () => {
 
     it("WordSyntax has required field and we call coach.parse(Word)", () => {
         class Word extends Syntax<Word> {
-            /* istanbul ignore next */
             structure() {
                 return {
                     word: Types.String({
@@ -998,7 +988,6 @@ describe("Coach tests", () => {
                 };
             }
 
-            /* istanbul ignore next */
             is(coach2) {
                 return coach2.is(/[a-z]+/);
             }

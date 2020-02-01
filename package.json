@@ -1,6 +1,6 @@
 {
   "name": "lang-coach",
-  "version": "2.2.10",
+  "version": "2.2.9",
   "description": "libary for parsing languages",
   "main": "dist/index.js",
   "types": "lib/index.ts",
@@ -36,12 +36,12 @@
   "author": "Eprincev Egor",
   "license": "ISC",
   "dependencies": {
-    "@types/mocha": "^5.2.7",
     "model-layer": "^2.0.8"
   },
   "devDependencies": {
+    "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
-    "mocha": "^7.0.1",
+    "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.3.0",
