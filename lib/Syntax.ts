@@ -14,6 +14,10 @@ interface ISyntax extends Model<any> {
 export abstract class Syntax<TSyntax extends Syntax<any>> extends Model<TSyntax> implements ISyntax {
     syntax: Coach["syntax"];
 
+    structure(): any {
+        throw new Error(`static ${ this.constructor.name }.structure() is not declared`);
+    }
+
     parse(coach: Coach, data: IAnyObject, options?: IAnyObject): void {
         throw new Error(`static ${ this.constructor.name }.parse(coach, options) is not declared`);
     }

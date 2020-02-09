@@ -4,6 +4,19 @@ import {Syntax} from "../lib/Syntax";
 
 describe("Coach tests", () => {
     
+    it("default behavior for static method Syntax.structure", () => {
+
+        class SomeSyntax extends Syntax<SomeSyntax> {}
+
+        assert.throws(
+            () => {
+                (new SomeSyntax() as any).parse();
+            }, 
+            (err) =>
+                err.message === "static SomeSyntax.structure() is not declared"
+        );
+    });
+
     it("default behavior for static method Syntax.parse", () => {
 
         class SomeSyntax extends Syntax<SomeSyntax> {
