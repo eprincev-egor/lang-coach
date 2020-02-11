@@ -30,6 +30,14 @@ describe("Coach tests", () => {
             is(coach2) {
                 return coach2.is("1");
             }
+
+            parse() {
+                // nothing
+            }
+
+            toString() {
+                return "";
+            }
         }
 
         let coach;
@@ -56,6 +64,14 @@ describe("Coach tests", () => {
                     options.alphabet &&
                     coach2.is(/\w/)
                 );
+            }
+
+            parse() {
+                // nothing
+            }
+
+            toString() {
+                return "";
             }
         }
 
@@ -553,6 +569,10 @@ describe("Coach tests", () => {
             parse(coach2, data) {
                 data.word = coach2.expectWord();
             }
+
+            toString() {
+                return "";
+            }
         }
         
 
@@ -591,6 +611,14 @@ describe("Coach tests", () => {
                     coach2.is(/\w/)
                 );
             }
+
+            parse() {
+                // nothing
+            }
+
+            toString() {
+                return "";
+            }
         }
 
         class SomeLang extends Coach {
@@ -628,6 +656,10 @@ describe("Coach tests", () => {
             parse(coach2, data, options) {
                 data.options = JSON.stringify(options);
                 data.word = coach2.expectWord();
+            }
+
+            toString() {
+                return "";
             }
         }
 
@@ -706,6 +738,10 @@ describe("Coach tests", () => {
                     data.word = coach2.expect(/[a-z]+/);
                 }
             }
+
+            toString() {
+                return "";
+            }
         }
 
         class SomeLang extends Coach {
@@ -752,6 +788,10 @@ describe("Coach tests", () => {
             parse(coach2, data, options) {
                 data.options = JSON.stringify(options);
                 data.word = coach.expectWord();
+            }
+
+            toString() {
+                return "";
             }
         }
 
@@ -819,6 +859,10 @@ describe("Coach tests", () => {
                     data.word = coach2.expect(/[a-z]+/);
                 }
             }
+
+            toString() {
+                return "";
+            }
         }
 
         class SomeLang extends Coach {
@@ -863,6 +907,10 @@ describe("Coach tests", () => {
             parse(coach2: SomeLang, data: this["TInputData"]) {
                 data.word = coach2.expect(/[a-z]+/);
             }
+
+            toString() {
+                return "";
+            }
         }
 
         class Phrase extends Syntax<Phrase> {
@@ -874,8 +922,16 @@ describe("Coach tests", () => {
                 };
             }
 
+            is() {
+                return true;
+            }
+
             parse(coach2: SomeLang, data: this["TInputData"]) {
                 data.words = coach2.parseChain(Word);
+            }
+
+            toString() {
+                return "";
             }
         }
 
@@ -912,6 +968,10 @@ describe("Coach tests", () => {
             parse(coach2: SomeLang, data: this["TInputData"]) {
                 data.word = coach2.expect(/[a-z]+/);
             }
+
+            toString() {
+                return "";
+            }
         }
 
         class Phrase extends Syntax<Phrase> {
@@ -929,6 +989,10 @@ describe("Coach tests", () => {
 
             is(coach2: SomeLang) {
                 return coach2.is( this.syntax.Word as SomeLang["syntax"]["Word"] );
+            }
+
+            toString() {
+                return "";
             }
         }
 
@@ -965,6 +1029,10 @@ describe("Coach tests", () => {
             parse(coach2: SomeLang, data: this["TInputData"]) {
                 data.word = coach2.expect(/[a-z]+/);
             }
+
+            toString() {
+                return "";
+            }
         }
 
         class SomeLang extends Coach {
@@ -998,6 +1066,10 @@ describe("Coach tests", () => {
 
             parseWord(coach2: SomeLang) {
                 return coach2.expect(/[a-z]+/);
+            }
+
+            toString() {
+                return "";
             }
         }
 
