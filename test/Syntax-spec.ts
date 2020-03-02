@@ -4,27 +4,14 @@ import {Syntax} from "../lib/Syntax";
 
 describe("Coach tests", () => {
     
-    it("default behavior for static method Syntax.structure", () => {
+    it("default behavior for method method Syntax.parse", () => {
 
-        class SomeSyntax extends Syntax<SomeSyntax> {}
-
-        assert.throws(
-            () => {
-                (new SomeSyntax() as any).parse();
-            }, 
-            (err) =>
-                err.message === "static SomeSyntax.structure() is not declared"
-        );
-    });
-
-    it("default behavior for static method Syntax.parse", () => {
-
-        class SomeSyntax extends Syntax<SomeSyntax> {
+        class SomeSyntax extends (Syntax as any) {
             structure() {
                 return {};
             }
         }
-        class AnotherSyntax extends Syntax<AnotherSyntax> {
+        class AnotherSyntax extends (Syntax as any) {
             structure() {
                 return {};
             }
@@ -35,7 +22,7 @@ describe("Coach tests", () => {
                 (new SomeSyntax() as any).parse();
             }, 
             (err) =>
-                err.message === "static SomeSyntax.parse(coach, options) is not declared"
+                err.message === "method SomeSyntax.parse(coach, data, options) is not declared"
         );
 
         assert.throws(
@@ -43,18 +30,18 @@ describe("Coach tests", () => {
                 (new AnotherSyntax() as any).parse();
             }, 
             (err) =>
-                err.message === "static AnotherSyntax.parse(coach, options) is not declared"
+                err.message === "method AnotherSyntax.parse(coach, data, options) is not declared"
         );
     });
 
-    it("default behavior for static method Syntax.is", () => {
+    it("default behavior for method method Syntax.is", () => {
 
-        class SomeSyntax extends Syntax<SomeSyntax> {
+        class SomeSyntax extends (Syntax as any) {
             structure() {
                 return {};
             }
         }
-        class AnotherSyntax extends Syntax<AnotherSyntax> {
+        class AnotherSyntax extends (Syntax as any) {
             structure() {
                 return {};
             }
@@ -65,7 +52,7 @@ describe("Coach tests", () => {
                 (new SomeSyntax() as any).is();
             }, 
             (err) =>
-                err.message === "static SomeSyntax.is(coach, options) is not declared"
+                err.message === "method SomeSyntax.is(coach, str, options) is not declared"
         );
 
         assert.throws(
@@ -73,18 +60,18 @@ describe("Coach tests", () => {
                 (new AnotherSyntax() as any).is();
             }, 
             (err) =>
-                err.message === "static AnotherSyntax.is(coach, options) is not declared"
+                err.message === "method AnotherSyntax.is(coach, str, options) is not declared"
         );
     });
 
     it("default behavior for method Syntax.toString(options)", () => {
 
-        class SomeSyntax extends Syntax<SomeSyntax> {
+        class SomeSyntax extends (Syntax as any) {
             structure() {
                 return {};
             }
         }
-        class AnotherSyntax extends Syntax<AnotherSyntax> {
+        class AnotherSyntax extends (Syntax as any) {
             structure() {
                 return {};
             }
@@ -95,7 +82,7 @@ describe("Coach tests", () => {
                 new SomeSyntax().toString();
             }, 
             (err) =>
-                err.message === "SomeSyntax.toString(options) is not declared"
+                err.message === "method SomeSyntax.toString(options) is not declared"
         );
 
         assert.throws(
@@ -103,7 +90,7 @@ describe("Coach tests", () => {
                 new AnotherSyntax().toString();
             }, 
             (err) =>
-                err.message === "AnotherSyntax.toString(options) is not declared"
+                err.message === "method AnotherSyntax.toString(options) is not declared"
         );
     });
 
