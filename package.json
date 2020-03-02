@@ -1,6 +1,6 @@
 {
   "name": "lang-coach",
-  "version": "2.3.14",
+  "version": "2.3.15",
   "description": "libary for parsing languages",
   "main": "dist/index.js",
   "types": "lib/index.ts",

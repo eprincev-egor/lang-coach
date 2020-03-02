@@ -326,19 +326,15 @@ export class Coach {
         return this.i >= this.str.length;
     }
 
-    // parsing over "," and returning array of syntax objects
-    // first argument SyntaxName is string: "Expression" or "ObjectLink" or any SyntaxName,
-    // first symbol must be in upper case
-    // or object like are:
-    // {
-    //    is: function,
-    //    parse: function
-    // }
     parseComma<K extends keyof this["syntax"], T extends this["syntax"][K]>(
         SomeSyntax: T, 
         options?: IAnyObject,
         elements: Array<InstanceType<T>> = []
     ): Array<InstanceType<T>> {
+        
+        // skipSpace() can be redefined
+        this.skipSpace();
+
         if ( !this.is(SomeSyntax, options) ) {
             this.throwError("expected: " + SomeSyntax.name);
         }
@@ -346,8 +342,10 @@ export class Coach {
         const elem = this.parse(SomeSyntax, options);
         elements.push( elem );
 
-        if ( this.is(/\s*,/) ) {
-            this.skipSpace();
+        // skipSpace() can be redefined
+        this.skipSpace();
+
+        if ( this.is(",") ) {
             this.i++; // ,
             this.skipSpace();
 

@@ -635,17 +635,28 @@ describe("Coach tests", () => {
             syntax = {
                 AnyWord
             };
+
+            skipSpace(): void {
+                for (; this.i < this.n; this.i++) {
+                    const symbol = this.str[ this.i ];
+        
+                    if ( !/[\s_]/.test(symbol) ) {
+                        break;
+                    }
+                }
+            }
         }
 
-        let coach = new SomeLang("one,\r two\n,\tthree  some");
+        let coach = new SomeLang("_ one _,\r two\n,\tthree _,_ four  some");
 
         let result = coach.parseComma(AnyWord);
 
-        assert.equal(result.length, 3);
+        assert.equal(result.length, 4);
 
         assert.ok( result[0] instanceof AnyWord );
         assert.ok( result[1] instanceof AnyWord );
         assert.ok( result[2] instanceof AnyWord );
+        assert.ok( result[3] instanceof AnyWord );
 
         assert.ok( coach.is("some") );
 
@@ -657,6 +668,9 @@ describe("Coach tests", () => {
 
         assert.equal( result[2].get("word"), "three" );
         assert.equal( result[2].get("options"), null );
+
+        assert.equal( result[3].get("word"), "four" );
+        assert.equal( result[3].get("options"), null );
 
         // run with options
         coach = new SomeLang("one,\r two\n,\tthree  !!!");
