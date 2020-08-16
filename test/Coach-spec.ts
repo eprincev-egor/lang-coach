@@ -1165,5 +1165,71 @@ describe("Coach tests", () => {
         assert.ok(firstWordParent === phrase, "valid parent");
     });
     
+    it("clone syntax and check parent reference", () => {
+        class Word extends Syntax<Word> {
+            structure() {
+                return {
+                    word: Types.String({
+                        required: true
+                    })
+                };
+            }
+
+            is(coach2) {
+                return coach2.is(/[a-z]+/);
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.word = this.parseWord(coach2);
+            }
+
+            parseWord(coach2: SomeLang) {
+                return coach2.expect(/[a-z]+/);
+            }
+
+            toString() {
+                return "";
+            }
+        }
+
+        class Phrase extends Syntax<Phrase> {
+            structure() {
+                return {
+                    words: Types.Array({
+                        element: Word
+                    })
+                };
+            }
+
+            is(coach2) {
+                return coach2.is(/[a-z]+/);
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.words = coach.parseChain(Word);
+            }
+
+            toString() {
+                return "";
+            }
+        }
+
+        class SomeLang extends Coach {
+            syntax = {
+                Word,
+                Phrase
+            };
+        }
+
+        const coach = new SomeLang("hello world");
+        const phrase = coach.parse(Phrase);
+        const phraseClone = phrase.clone();
+
+        const firstWord = phraseClone.get("words")[0];
+        const firstWordParent = firstWord.findParentInstance(Phrase);
+
+        assert.ok(firstWordParent === phraseClone, "valid clone parent");
+    });
+    
 
 });
