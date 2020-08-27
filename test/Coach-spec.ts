@@ -128,6 +128,20 @@ describe("Coach tests", () => {
         assert.equal(secondWord, "world");
     });
 
+    it("coach.readWord() after change offset", () => {
+        const coach = new Coach(" Hello World 1");
+        let word;
+
+        word = coach.readWord();
+        assert.equal(word, "hello");
+        
+        coach.i = 0;
+
+        word = coach.readWord();
+        assert.equal(word, "hello");
+        assert.ok( coach.isWord("world") );
+    });
+
     it("coach.isWord()", () => {
         let coach: Coach;
 
@@ -141,6 +155,32 @@ describe("Coach tests", () => {
 
         coach = new Coach("***");
         assert.ok( !coach.isWord() );
+    });
+
+    it("coach.isWord() after change offset", () => {
+        let coach: Coach;
+
+        coach = new Coach("Hello world here");
+
+        assert.ok( coach.isWord() );
+        assert.ok( coach.isWord("hello") );
+        assert.ok( !coach.isWord("home") );
+        
+        // change offset
+        coach.i = 6;
+
+        assert.ok( coach.isWord() );
+        assert.ok( !coach.isWord("hello") );
+        assert.ok( coach.isWord("world") );
+
+        // again change offset
+        coach.i = 12;
+
+        assert.ok( coach.isWord() );
+        assert.ok( !coach.isWord("hello") );
+        assert.ok( !coach.isWord("world") );
+        assert.ok( coach.isWord("here") );
+
     });
 
     it("coach.read(regExp)", () => {

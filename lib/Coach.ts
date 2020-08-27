@@ -23,6 +23,10 @@ export class Coach {
         [key: string]: new (...args: any) => Syntax<any>;
     };
 
+    private lastWord?: string;
+    private lastWordStartIndex?: number;
+    private lastWordEndIndex?: number;
+
     constructor(str: string) {
         this.str = str;
         this.n = str.length;
@@ -42,6 +46,12 @@ export class Coach {
     readWord(): string {
         let word = "";
 
+        const startIndex = this.i;
+        if ( startIndex === this.lastWordStartIndex ) {
+            this.i = this.lastWordEndIndex;
+            return this.lastWord;
+        }
+
         this.skipSpace();
 
         for (; this.i < this.n; this.i++) {
@@ -56,7 +66,14 @@ export class Coach {
 
         this.skipSpace();
 
-        return word.toLowerCase();
+        const endIndex = this.i;
+        const lowerWord = word.toLowerCase();
+        
+        this.lastWordStartIndex = startIndex;
+        this.lastWordEndIndex = endIndex;
+        this.lastWord = lowerWord;
+
+        return lowerWord;
     }
 
     // test string (from current place) on regExp
