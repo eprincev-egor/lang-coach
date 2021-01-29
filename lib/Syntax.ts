@@ -16,8 +16,8 @@ extends Model<TSyntax>
 implements ISyntax {
     protected syntax!: Coach["syntax"];
 
-    abstract parse<T extends Coach = Coach>(coach: T, data: IAnyObject, options?: IAnyObject): void;
-    abstract is<T extends Coach = Coach>(coach: T, str: string, options?: IAnyObject): boolean;
+    abstract parse(coach: Coach, data: IAnyObject, options?: IAnyObject): void;
+    abstract is(coach: Coach, str: string, options?: IAnyObject): boolean;
     abstract toString(options?: IAnyObject): string;
 }
 
