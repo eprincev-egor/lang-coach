@@ -21,7 +21,7 @@ describe("Coach tests", () => {
             () => {
                 (new SomeSyntax() as any).parse();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "method SomeSyntax.parse(coach, data, options) is not declared"
         );
 
@@ -29,7 +29,7 @@ describe("Coach tests", () => {
             () => {
                 (new AnotherSyntax() as any).parse();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "method AnotherSyntax.parse(coach, data, options) is not declared"
         );
     });
@@ -51,7 +51,7 @@ describe("Coach tests", () => {
             () => {
                 (new SomeSyntax() as any).is();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "method SomeSyntax.is(coach, str, options) is not declared"
         );
 
@@ -59,7 +59,7 @@ describe("Coach tests", () => {
             () => {
                 (new AnotherSyntax() as any).is();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "method AnotherSyntax.is(coach, str, options) is not declared"
         );
     });
@@ -81,7 +81,7 @@ describe("Coach tests", () => {
             () => {
                 new SomeSyntax().toString();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "method SomeSyntax.toString(options) is not declared"
         );
 
@@ -89,7 +89,7 @@ describe("Coach tests", () => {
             () => {
                 new AnotherSyntax().toString();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "method AnotherSyntax.toString(options) is not declared"
         );
     });

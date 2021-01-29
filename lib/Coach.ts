@@ -19,9 +19,7 @@ export class Coach {
     public n: number;
     public i: number;
 
-    public syntax: {
-        [key: string]: new (...args: any) => Syntax<any>;
-    };
+    public syntax: any;
 
     private lastWord?: string;
     private lastWordStartIndex?: number;
@@ -31,6 +29,7 @@ export class Coach {
         this.str = str;
         this.n = str.length;
         this.i = 0;
+        this.syntax = {};
     }
     
     skipSpace(): void {
@@ -48,8 +47,8 @@ export class Coach {
 
         const startIndex = this.i;
         if ( startIndex === this.lastWordStartIndex ) {
-            this.i = this.lastWordEndIndex;
-            return this.lastWord;
+            this.i = this.lastWordEndIndex!;
+            return this.lastWord!;
         }
 
         this.skipSpace();
@@ -134,7 +133,7 @@ export class Coach {
         return currentWord.toLowerCase() === word;
     }
 
-    read(regExp: RegExp): string {
+    read(regExp: RegExp): string | null {
         const str = this.str.slice(this.i);
         const execResult = regExp.exec(str);
 
@@ -185,7 +184,7 @@ export class Coach {
 
         const prevLines = this.str.slice(0, this.i).split(EOL_REG_EXP);
         const nextLines = this.str.slice(this.i).split(EOL_REG_EXP);
-        const currentLine = prevLines.pop() + nextLines.shift();
+        const currentLine = prevLines.pop()! + nextLines.shift();
         const nearLines: string[] = [];
         // current line index inside array nearLines
         let currentLineIndex = half;
@@ -234,7 +233,7 @@ export class Coach {
     }
 
     
-    throwError(message: string): void {
+    throwError(message: string): never {
         const position = this.getPosition();
 
         const near = this.getNearLines(5);
@@ -286,7 +285,7 @@ export class Coach {
         } else {
             const regExp = strOrRegExp;
             const str = this.str.slice(this.i);
-            const execResult = regExp.exec(str);
+            const execResult = regExp.exec(str)!;
 
             if ( !execResult || execResult.index !== 0 ) {
                 if ( message == null ) {

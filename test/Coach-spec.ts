@@ -27,7 +27,7 @@ describe("Coach tests", () => {
                 return {};
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is("1");
             }
 
@@ -55,7 +55,7 @@ describe("Coach tests", () => {
                 return {};
             }
 
-            is(coach2, str, options) {
+            is(coach2: Coach, str: string, options: any) {
                 options = options || {alphabet: false};
 
                 return (
@@ -94,7 +94,7 @@ describe("Coach tests", () => {
             () => {
                 (coach as any).is();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "invalid call, use is(arg) with regExp or string or Syntax"
         );
     });
@@ -344,7 +344,7 @@ describe("Coach tests", () => {
             () => {
                 coach.getNearLines(2);
             },
-            (err) =>
+            (err: Error) =>
                 /linesCount should be odd/.test(err.message)
         );
     });
@@ -358,7 +358,7 @@ describe("Coach tests", () => {
                 coach.readWord();
                 coach.throwError("test");
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 2" +
                     ", column 1" +
                     "\n" +
@@ -382,7 +382,7 @@ describe("Coach tests", () => {
                 coach.i = 666;
                 coach.expectWord("test");
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 57" +
                     ", column 4" +
                     "\n" +
@@ -407,7 +407,7 @@ describe("Coach tests", () => {
                 coach.i = 90;
                 coach.expectWord("test");
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 9" +
                     ", column 3" +
                     "\n" +
@@ -422,7 +422,7 @@ describe("Coach tests", () => {
 
     it("coach.expect(str)", () => {
         let result;
-        let coach;
+        let coach: Coach;
         
         // call expect, when position before expected string
         coach = new Coach("some text");
@@ -439,7 +439,7 @@ describe("Coach tests", () => {
             () => {
                 coach.expect("text");
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     "\n" +
@@ -453,7 +453,7 @@ describe("Coach tests", () => {
             () => {
                 coach.expect("text", "custom error message");
             }, 
-            (err) =>
+            (err: Error) =>
             err.message === "SyntaxError at line 1" +
                 ", column 0" +
                 "\n" +
@@ -464,7 +464,7 @@ describe("Coach tests", () => {
 
     it("coach.expect(regExp)", () => {
         let result;
-        let coach;
+        let coach: Coach;
 
         // call expect, when position before expected pattern
         coach = new Coach("some text");
@@ -480,7 +480,7 @@ describe("Coach tests", () => {
             () => {
                 coach.expect(/text/);
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     "\n" +
@@ -494,7 +494,7 @@ describe("Coach tests", () => {
             () => {
                 coach.expect(/text/, "custom error text");
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     "\n" +
@@ -505,7 +505,7 @@ describe("Coach tests", () => {
 
     it("coach.expectWord(str)", () => {
         let result;
-        let coach;
+        let coach: Coach;
         
         // call expect, when position before expected string
         coach = new Coach("  Expected!");
@@ -522,7 +522,7 @@ describe("Coach tests", () => {
             () => {
                 coach.expectWord("some");
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     "\n" +
@@ -534,7 +534,7 @@ describe("Coach tests", () => {
 
     it("coach.expectWord()", () => {
         let result;
-        let coach;
+        let coach: Coach;
         
         // call expect, when position before any word
         coach = new Coach("  WORD!");
@@ -551,7 +551,7 @@ describe("Coach tests", () => {
             () => {
                 coach.expectWord();
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     "\n" +
@@ -572,7 +572,7 @@ describe("Coach tests", () => {
             () => {
                 coach.parseUnicode("***");
             }, 
-            (err) =>
+            (err: Error) =>
                 err.message === "SyntaxError at line 1" +
                     ", column 0" +
                     "\n" +
@@ -602,11 +602,11 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.isWord();
             }
 
-            parse(coach2, data) {
+            parse(coach2: Coach, data: any) {
                 data.word = coach2.expectWord();
             }
 
@@ -641,7 +641,7 @@ describe("Coach tests", () => {
                 return {};
             }
 
-            is(coach2, str, options) {
+            is(coach2: Coach, str: string, options: any) {
                 options = options || {alphabet: false};
 
                 return (
@@ -689,11 +689,11 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.isWord();
             }
 
-            parse(coach2, data, options) {
+            parse(coach2: Coach, data: any, options: any) {
                 data.options = JSON.stringify(options);
                 data.word = coach2.expectWord();
             }
@@ -759,7 +759,7 @@ describe("Coach tests", () => {
                 coach = new SomeLang("!!");
                 result = coach.parseComma(AnyWord);
             },
-            (err) =>
+            (err: Error) =>
                 /expected: AnyWord/.test( err.message )
         );
     });
@@ -773,7 +773,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2, str, options) {
+            is(coach2: Coach, str: string, options: any) {
                 options = options || {numbers: false};
                 return (
                     coach2.is(/[a-z]/) ||
@@ -783,7 +783,7 @@ describe("Coach tests", () => {
                 );
             }
 
-            parse(coach2, data, options) {
+            parse(coach2: Coach, data: any, options: any) {
                 options = options || {numbers: false};
 
                 if ( options.numbers ) {
@@ -835,11 +835,11 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.isWord();
             }
 
-            parse(coach2, data, options) {
+            parse(coach2: Coach, data: any, options: any) {
                 data.options = JSON.stringify(options);
                 data.word = coach.expectWord();
             }
@@ -894,7 +894,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2, str, options) {
+            is(coach2: Coach, str: string, options: any) {
                 options = options || {numbers: false};
                 return (
                     coach2.is(/[a-z]/) ||
@@ -904,7 +904,7 @@ describe("Coach tests", () => {
                 );
             }
 
-            parse(coach2, data, options) {
+            parse(coach2: Coach, data: any, options: any) {
                 options = options || {numbers: false};
 
                 if ( options.numbers ) {
@@ -954,7 +954,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1015,7 +1015,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1076,7 +1076,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1110,7 +1110,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1151,7 +1151,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1177,7 +1177,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1199,7 +1199,7 @@ describe("Coach tests", () => {
 
         const coach = new SomeLang("hello world");
         const phrase = coach.parse(Phrase);
-        const firstWord = phrase.get("words")[0];
+        const firstWord = phrase.get("words")![0];
         const firstWordParent = firstWord.findParentInstance(Phrase);
 
         assert.ok(firstWordParent === phrase, "valid parent");
@@ -1215,7 +1215,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1241,7 +1241,7 @@ describe("Coach tests", () => {
                 };
             }
 
-            is(coach2) {
+            is(coach2: Coach) {
                 return coach2.is(/[a-z]+/);
             }
 
@@ -1265,7 +1265,7 @@ describe("Coach tests", () => {
         const phrase = coach.parse(Phrase);
         const phraseClone = phrase.clone();
 
-        const firstWord = phraseClone.get("words")[0];
+        const firstWord = phraseClone.get("words")![0];
         const firstWordParent = firstWord.findParentInstance(Phrase);
 
         assert.ok(firstWordParent === phraseClone, "valid clone parent");
