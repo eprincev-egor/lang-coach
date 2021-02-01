@@ -1,4 +1,3 @@
-import {Syntax} from "./Syntax";
 
 interface IAnyObject {
     [key: string]: any;
@@ -401,6 +400,17 @@ export class Coach {
         return elements;
     }
 
+    setPositionBefore<K extends keyof this["syntax"], T extends this["syntax"][K]>(
+        someSyntax: InstanceType<T>
+    ): void {
+        if ( "start" in someSyntax ) {
+            this.i = someSyntax.start;
+        }
+        else {
+            throw new Error("cannot detect syntax position");
+        }
+    }
+
     parse<K extends keyof this["syntax"], T extends this["syntax"][K]>(
         SomeSyntax: T,
         options?: IAnyObject
@@ -433,7 +443,12 @@ export class Coach {
     ): InstanceType<T> {
         const tmpSyntax = Object.create(SomeSyntax.prototype);
         const data = {};
+
+        tmpSyntax.start = this.i;
         tmpSyntax.parse(this, data, options);
-        return new SomeSyntax(data) as any;
+
+        const syntax = new SomeSyntax(data) as any;
+        syntax.start = tmpSyntax.start;
+        return syntax;
     }
 }

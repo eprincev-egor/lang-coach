@@ -1271,5 +1271,54 @@ describe("Coach tests", () => {
         assert.ok(firstWordParent === phraseClone, "valid clone parent");
     });
     
+    it("setPositionBefore(syntax)", () => {
+        class Word extends Syntax<Word> {
+            structure() {
+                return {
+                    word: Types.String({
+                        required: true
+                    })
+                };
+            }
+
+            is(coach2: Coach) {
+                return coach2.is(/[a-z]+/);
+            }
+
+            parse(coach2: SomeLang, data: this["TInputData"]) {
+                data.word = this.parseWord(coach2);
+            }
+
+            parseWord(coach2: SomeLang) {
+                return coach2.expect(/[a-z]+/);
+            }
+
+            toString() {
+                return "";
+            }
+        }
+
+        class SomeLang extends Coach {
+            syntax = {
+                Word
+            };
+        }
+
+        const coach = new SomeLang("hello world");
+
+        const hello = coach.parse(Word);
+        coach.skipSpace();
+        const world = coach.parse(Word);
+        
+        assert.strictEqual( (hello as any).start, 0, "valid start position for 'hello'" );
+        assert.strictEqual( (world as any).start, 6, "valid start position for 'world'" );
+
+        coach.setPositionBefore(hello);
+        assert.ok( coach.isWord("hello"), "now position before 'hello'" );
+
+        coach.setPositionBefore(world);
+        assert.ok( coach.isWord("world"), "now position before 'world'" );
+    });
+    
 
 });
