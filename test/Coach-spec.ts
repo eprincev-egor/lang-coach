@@ -386,11 +386,15 @@ describe("Coach tests", () => {
                 err.message === "SyntaxError at line 57" +
                     ", column 4" +
                     "\n" +
+                    "\n  53 | line # 53" +
+                    "\n  54 | line # 54" +
                     "\n  55 | line # 55" +
                     "\n  56 | line # 56" +
                     "\n> 57 | line # 57" +
                     "\n  58 | line # 58" +
                     "\n  59 | line # 59" +
+                    "\n  60 | line # 60" +
+                    "\n  61 | line # 61" +
                     "\n\n Message: expected word: test"
         );
 
@@ -411,11 +415,15 @@ describe("Coach tests", () => {
                 err.message === "SyntaxError at line 9" +
                     ", column 3" +
                     "\n" +
+                    "\n   5 | line # 5" +
+                    "\n   6 | line # 6" +
                     "\n   7 | line # 7" +
                     "\n   8 | line # 8" +
                     "\n>  9 | line # 9" +
                     "\n  10 | line # 10" +
                     "\n  11 | line # 11" +
+                    "\n  12 | line # 12" +
+                    "\n  13 | line # 13" +
                     "\n\n Message: expected word: test"
         );
     });

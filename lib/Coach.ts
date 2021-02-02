@@ -235,7 +235,7 @@ export class Coach {
     throwError(message: string): never {
         const position = this.getPosition();
 
-        const near = this.getNearLines(5);
+        const near = this.getNearLines(9);
         const maxLineNumber = position.line + near.lines.length - near.currentLineIndex;
         const nearString = near.lines.map((line, i) => {
             const lineNumber = position.line - near.currentLineIndex + i;
