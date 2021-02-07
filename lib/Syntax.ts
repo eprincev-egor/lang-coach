@@ -16,6 +16,15 @@ extends Model<TSyntax>
 implements ISyntax {
     protected syntax!: Coach["syntax"];
 
+    /**
+     * when syntax was parsed,
+     * then we have are position inside parsed text
+     */
+    readonly position?: {
+        start: number;
+        end: number;
+    };
+
     abstract parse(coach: Coach, data: IAnyObject, options?: IAnyObject): void;
     abstract is(coach: Coach, str: string, options?: IAnyObject): boolean;
     abstract toString(options?: IAnyObject): string;
