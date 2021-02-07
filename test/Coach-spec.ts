@@ -1318,11 +1318,32 @@ describe("Coach tests", () => {
         coach.skipSpace();
         const world = coach.parse(Word);
         
-        assert.strictEqual( hello.position!.start, 0, "valid start position for 'hello'" );
-        assert.strictEqual( hello.position!.end, 5, "valid end position for 'hello'" );
+        assert.strictEqual(
+            hello.position!.start, 0,
+            "valid start position for 'hello'"
+        );
+        assert.strictEqual(
+            hello.position!.end, 5,
+            "valid end position for 'hello'"
+        );
 
-        assert.strictEqual( world.position!.start, 6, "valid start position for 'world'" );
-        assert.strictEqual( world.position!.end, 11, "valid end position for 'world'" );
+        assert.strictEqual(
+            world.position!.start, 6,
+            "valid start position for 'world'"
+        );
+        assert.strictEqual(
+            world.position!.end, 11,
+            "valid end position for 'world'"
+        );
+
+        assert.strictEqual(
+            world.clone().position!.start, 6, 
+            "valid start position for 'world'" 
+        );
+        assert.strictEqual(
+            world.clone().position!.end, 11,
+            "valid end position for 'world'"
+        );
 
         coach.setPositionBefore(hello);
         assert.ok( coach.isWord("hello"), "now position before 'hello'" );

@@ -28,6 +28,12 @@ implements ISyntax {
     abstract parse(coach: Coach, data: IAnyObject, options?: IAnyObject): void;
     abstract is(coach: Coach, str: string, options?: IAnyObject): boolean;
     abstract toString(options?: IAnyObject): string;
+
+    clone(stack?: any): this {
+        const clone = super.clone(stack);
+        (clone as any).position = this.position;
+        return clone;
+    }
 }
 
 
